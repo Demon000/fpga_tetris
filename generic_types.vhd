@@ -2,11 +2,11 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 package graphics is
-    type length_2d is record
+    type vector_2d is record
         x : integer;
         y : integer;
-    end record length_2d;
-    subtype point_2d is length_2d;
+    end record vector_2d;
+    subtype point_2d is vector_2d;
 
     constant point_2d_init : point_2d := (
         x => -1,
