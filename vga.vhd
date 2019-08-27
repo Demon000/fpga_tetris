@@ -104,11 +104,13 @@ begin
     function is_point_in_rectangle(
             point : in point_2d;
             top_left_point : in point_2d;
-            bottom_right_point : in point_2d)
+            rectangle_length : in vector_2d)
         return boolean is
     begin
-        if point.x > top_left_point.x and point.x < bottom_right_point.x and
-                point.y > top_left_point.y and point.y < bottom_right_point.y then
+        if point.x > top_left_point.x and
+                point.x < top_left_point.x + rectangle_length.x and
+                point.y > top_left_point.y and
+                point.y < top_left_point.y + rectangle_length.y then
             return true;
         else
             return false;
@@ -117,11 +119,11 @@ begin
 
     impure function draw_rectangle(
             top_left_point : in point_2d;
-            bottom_right_point : in point_2d;
+            rectangle_length : in vector_2d;
             fill_color : in rgb_color)
         return boolean is
     begin
-        if is_point_in_rectangle(draw_point, top_left_point, bottom_right_point) then
+        if is_point_in_rectangle(draw_point, top_left_point, rectangle_length) then
             draw_point_color <= fill_color;
             return true;
         else
