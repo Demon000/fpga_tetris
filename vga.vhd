@@ -53,8 +53,17 @@ generic(
 );
 port(
     clock: in STD_LOGIC;
-    button_state : in STD_LOGIC;
-    button_press : out STD_LOGIC
+    button : in STD_LOGIC;
+    button_state : out STD_LOGIC
+);
+end component;
+
+-- Button Pulser component
+component button_pulser is
+port(
+    clock: in STD_LOGIC;
+    button_state : in STD_LOGIC := '0';
+    button_press : out STD_LOGIC := '0'
 );
 end component;
 
@@ -65,7 +74,10 @@ signal pixel_clock : STD_LOGIC;
 signal draw_point : point_2d := point_2d_init;
 signal draw_point_color : rgb_color := black_color;
 
+signal count_button_state : STD_LOGIC;
 signal count_button_press : STD_LOGIC;
+
+signal reset_button_state : STD_LOGIC;
 signal reset_button_press : STD_LOGIC;
 signal count_value : STD_LOGIC_VECTOR(3 downto 0) := "0000";
 
@@ -88,14 +100,28 @@ begin
     count_button_debouncer : button_debouncer
     port map(
         clock => system_clock,
-        button_state => count_button,
+        button => count_button,
+        button_state => count_button_state
+    );
+
+    count_button_pulser : button_pulser
+    port map(
+        clock => system_clock,
+        button_state => count_button_state,
         button_press => count_button_press
     );
 
     reset_button_debouncer : button_debouncer
     port map(
         clock => system_clock,
-        button_state => reset_button,
+        button => reset_button,
+        button_state => reset_button_state
+    );
+
+    reset_button_pulser : button_pulser
+    port map(
+        clock => system_clock,
+        button_state => reset_button_state,
         button_press => reset_button_press
     );
 
