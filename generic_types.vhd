@@ -20,6 +20,12 @@ package graphics is
         b : single_color;
     end record rgb_color;
 
+    function is_point_in_rectangle(
+                point : in point_2d;
+                top_left_point : in point_2d;
+                rectangle_length : in vector_2d)
+            return boolean;
+
     -- 000000
     constant black_color : rgb_color := (
         r => "0000",
@@ -76,3 +82,20 @@ package graphics is
         b => "0000"
     );
 end package graphics;
+package body graphics is
+    function is_point_in_rectangle(
+            point : in point_2d;
+            top_left_point : in point_2d;
+            rectangle_length : in vector_2d)
+        return boolean is
+    begin
+        if point.x > top_left_point.x and
+                point.x < top_left_point.x + rectangle_length.x and
+                point.y > top_left_point.y and
+                point.y < top_left_point.y + rectangle_length.y then
+            return true;
+        else
+            return false;
+        end if;
+    end function is_point_in_rectangle;
+end package body graphics;
