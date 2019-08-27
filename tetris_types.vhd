@@ -32,7 +32,11 @@ package game is
             class : piece_class)
         return tetris_piece;
 
-    function get_rotation_table(
+    function get_piece_color(
+            class : piece_class)
+        return rgb_color;
+
+    function get_piece_rotation_table(
             class : piece_class;
             rotation : piece_rotation)
         return piece_table_data;
@@ -276,7 +280,25 @@ package body game is
         return piece;
     end function get_piece;
 
-    function get_rotation_table(
+    function get_piece_color(
+            class : piece_class)
+        return rgb_color is
+    variable color : rgb_color;
+    begin
+        case class is
+            when 0 => color := cyan_color;
+            when 1 => color := blue_color;
+            when 2 => color := orange_color;
+            when 3 => color := yellow_color;
+            when 4 => color := green_color;
+            when 5 => color := magenta_color;
+            when 6 => color := red_color;
+        end case;
+
+        return color;
+    end function get_piece_color;
+
+    function get_piece_rotation_table(
             class : piece_class;
             rotation : piece_rotation)
         return piece_table_data is
@@ -293,5 +315,5 @@ package body game is
         end case;
 
         return table;
-    end function get_rotation_table;
+    end function get_piece_rotation_table;
 end package body game;
