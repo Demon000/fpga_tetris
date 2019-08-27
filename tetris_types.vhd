@@ -4,7 +4,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 library generic_types;
 use generic_types.graphics.all;
 
-package table is
+package game is
     type tetris_table_data is array(0 to 21, 0 to 9) of integer;
     type piece_table_data is array(0 to 3, 0 to 3) of bit;
     subtype piece_class is integer range 0 to 5;
@@ -222,9 +222,9 @@ package table is
             "0000"
         )
     );
-end package table;
+end package game;
 
-package body table is
+package body game is
     function get_next_rotation(
             rotation : in piece_rotation)
         return piece_rotation is
@@ -287,4 +287,4 @@ package body table is
 
         return table;
     end function get_rotation_table;
-end package body table;
+end package body game;
