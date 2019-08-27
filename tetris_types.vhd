@@ -35,6 +35,9 @@ package game is
             rotation : piece_rotation)
         return piece_table_data;
 
+    -- Empty tetris table data
+    constant tetris_table_data_init : tetris_table_data := (others => (others => 0));
+
     -- I piece
     constant i_piece : tetris_piece := (
         color => cyan_color,
