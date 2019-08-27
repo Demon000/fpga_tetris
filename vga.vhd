@@ -76,19 +76,7 @@ begin
     );
 
     vga_controller_inst : vga_controller
-    generic map(
-        -- 1280x1024@60 Hz
-        config => (
-            hfp_length => 48,
-            hsync_length => 112,
-            hbp_length => 248,
-            hview_length => 1280,
-            vfp_length => 1,
-            vsync_length => 3,
-            vbp_length => 38,
-            vview_length => 1024
-        )
-    )
+    generic map(vga_config_1280_1024_60)
     port map(
         clock => pixel_clock,
         hsync => hsync,
