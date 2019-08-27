@@ -175,7 +175,6 @@ begin
                 should_blank := false;
             end if;
 
-
             if should_blank then
                 draw_point_color <= black_color;
             end if;
