@@ -5,17 +5,17 @@ library generic_types;
 use generic_types.graphics.all;
 
 package table is
-    type tetris_table is array(0 to 21, 0 to 9) of integer;
-    type piece_table is array(0 to 3, 0 to 3) of bit;
+    type tetris_table_data is array(0 to 21, 0 to 9) of integer;
+    type piece_table_data is array(0 to 3, 0 to 3) of bit;
     subtype piece_class is integer range 0 to 5;
     subtype piece_rotation is integer;
 
     type tetris_piece is record
         color : rgb_color;
-        table_0 : piece_table;
-        table_90 : piece_table;
-        table_180 : piece_table;
-        table_270 : piece_table;
+        table_0 : piece_table_data;
+        table_90 : piece_table_data;
+        table_180 : piece_table_data;
+        table_270 : piece_table_data;
     end record tetris_piece;
 
     function get_next_rotation(
@@ -33,7 +33,7 @@ package table is
     function get_rotation_table(
             class : piece_class;
             rotation : piece_rotation)
-        return piece_table;
+        return piece_table_data;
 
     -- I piece
     constant i_piece : tetris_piece := (
@@ -123,7 +123,7 @@ package table is
     );
 
     -- O piece
-    constant o_piece_table : piece_table := (
+    constant o_piece_table : piece_table_data := (
         "0110",
         "0110",
         "0000"
@@ -272,8 +272,8 @@ package body table is
     function get_rotation_table(
             class : piece_class;
             rotation : piece_rotation)
-        return piece_table is
-    variable table : piece_table;
+        return piece_table_data is
+    variable table : piece_table_data;
     variable piece : tetris_piece;
     begin
         piece := get_piece(class);
