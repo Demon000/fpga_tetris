@@ -5,11 +5,13 @@ library generic_types;
 use generic_types.graphics.all;
 
 package game is
-    type tetris_table_data is array(0 to 21, 0 to 9) of integer;
-    type piece_table_data is array(0 to 3, 0 to 3) of bit;
-    subtype piece_class is integer range 0 to 5;
-    subtype piece_rotation is integer;
+    subtype piece_color is natural range 0 to 5;
+    subtype piece_class is natural range 0 to 5;
+    subtype piece_rotation is natural range 0 to 3;
 
+    type tetris_table_data is array(0 to 21, 0 to 9) of piece_color;
+
+    type piece_table_data is array(0 to 3, 0 to 3) of bit;
     type tetris_piece is record
         color : rgb_color;
         table_0 : piece_table_data;
@@ -233,9 +235,10 @@ package body game is
         return piece_rotation is
     variable next_rotation : piece_rotation;
     begin
-        next_rotation := rotation + 1;
-        if rotation > 3 then
+        if rotation = 3 then
             next_rotation := 0;
+        else
+            next_rotation := rotation + 1;
         end if;
 
         return next_rotation;
@@ -246,9 +249,10 @@ package body game is
         return piece_rotation is
     variable prev_rotation : piece_rotation;
     begin
-        prev_rotation := rotation - 1;
-        if rotation < 0 then
+        if rotation = 0 then
             prev_rotation := 3;
+        else
+            prev_rotation := rotation - 1;
         end if;
 
         return prev_rotation;
