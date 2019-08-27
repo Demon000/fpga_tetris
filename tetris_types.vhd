@@ -13,7 +13,6 @@ package game is
 
     type piece_table_data is array(0 to 3, 0 to 3) of bit;
     type tetris_piece is record
-        color : rgb_color;
         table_0 : piece_table_data;
         table_90 : piece_table_data;
         table_180 : piece_table_data;
@@ -46,7 +45,6 @@ package game is
 
     -- I piece
     constant i_piece : tetris_piece := (
-        color => cyan_color,
         table_0 => (
             "0000",
             "1111",
@@ -75,7 +73,6 @@ package game is
 
     -- J piece
     constant j_piece : tetris_piece := (
-        color => blue_color,
         table_0 => (
             "1000",
             "1110",
@@ -104,7 +101,6 @@ package game is
 
     -- L piece
     constant l_piece : tetris_piece := (
-        color => orange_color,
         table_0 => (
             "0010",
             "1110",
@@ -138,7 +134,6 @@ package game is
         "0000"
     );
     constant o_piece : tetris_piece := (
-        color => yellow_color,
         table_0 => o_piece_table,
         table_90 => o_piece_table,
         table_180 => o_piece_table,
@@ -147,7 +142,6 @@ package game is
 
     -- S piece
     constant s_piece : tetris_piece := (
-        color => green_color,
         table_0 => (
             "0110",
             "1100",
@@ -176,7 +170,6 @@ package game is
 
     -- T piece
     constant t_piece : tetris_piece := (
-        color => magenta_color,
         table_0 => (
             "0100",
             "1110",
@@ -205,7 +198,6 @@ package game is
 
     -- Z piece
     constant z_piece : tetris_piece := (
-        color => red_color,
         table_0 => (
             "1100",
             "0110",
