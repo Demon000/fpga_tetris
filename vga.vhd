@@ -12,9 +12,9 @@ use generic_types.graphics.all;
 entity vga is
 port(
     system_clock : in STD_LOGIC;
-    red : out STD_LOGIC_VECTOR(3 downto 0);
-    green : out STD_LOGIC_VECTOR(3 downto 0);
-    blue : out STD_LOGIC_VECTOR(3 downto 0);
+    red : out single_color;
+    green : out single_color;
+    blue : out single_color;
     vsync : out STD_LOGIC;
     hsync: out STD_LOGIC;
     count_button : in STD_LOGIC;
@@ -63,6 +63,7 @@ signal pixel_clock : STD_LOGIC;
 
 -- Position of the drawing beam
 signal draw_point : point_2d := point_2d_init;
+signal draw_point_color : rgb_color := black_color;
 
 signal count_button_press : STD_LOGIC;
 signal reset_button_press : STD_LOGIC;
@@ -119,15 +120,11 @@ begin
     impure function draw_circle(
             center : in point_2d;
             radius : in integer;
-            r : in STD_LOGIC_VECTOR(3 downto 0);
-            g : in STD_LOGIC_VECTOR(3 downto 0);
-            b : in STD_LOGIC_VECTOR(3 downto 0))
+            fill_color : in rgb_color)
         return boolean is
     begin
         if is_point_in_circle(draw_point, center, radius) then
-            red <= r;
-            green <= g;
-            blue <= b;
+            draw_point_color <= fill_color;
             return true;
         else
             return false;
@@ -151,15 +148,11 @@ begin
     impure function draw_rectangle(
             top_left_point : in point_2d;
             bottom_right_point : in point_2d;
-            r : in STD_LOGIC_VECTOR(3 downto 0);
-            g : in STD_LOGIC_VECTOR(3 downto 0);
-            b : in STD_LOGIC_VECTOR(3 downto 0))
+            fill_color : in rgb_color)
         return boolean is
     begin
         if is_point_in_rectangle(draw_point, top_left_point, bottom_right_point) then
-            red <= r;
-            green <= g;
-            blue <= b;
+            draw_point_color <= fill_color;
             return true;
         else
             return false;
@@ -172,18 +165,16 @@ begin
             -- Blank everything by default
             should_blank := true;
 
-            if draw_circle((320, 380), 100, "1111", "1111", "1111") then
+            if draw_circle((320, 380), 100, ("1111", "1111", "1111")) then
                 should_blank := false;
             end if;
 
-            if draw_rectangle((400, 100), (500, 400), "1100", "0011", "0000") then
+            if draw_rectangle((400, 100), (500, 400), ("1100", "0011", "0000")) then
                 should_blank := false;
             end if;
 
             if should_blank then
-                red <= "0000";
-                green <= "0000";
-                blue <= "0000";
+                draw_point_color <= black_color;
             end if;
         end if;
     end process;
@@ -206,4 +197,8 @@ begin
     end process;
 
     display_leds <= count_value;
+
+    red <= draw_point_color.r;
+    green <= draw_point_color.g;
+    blue <= draw_point_color.b;
 end main;
