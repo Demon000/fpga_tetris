@@ -18,6 +18,23 @@ package table is
         table_270 : piece_table;
     end record tetris_piece;
 
+    function get_next_rotation(
+            rotation : in piece_rotation)
+        return piece_rotation;
+
+    function get_prev_rotation(
+            rotation : in piece_rotation)
+        return piece_rotation;
+
+    function get_piece(
+            class : piece_class)
+        return tetris_piece;
+
+    function get_rotation_table(
+            class : piece_class;
+            rotation : piece_rotation)
+        return piece_table;
+
     -- I piece
     constant i_piece : tetris_piece := (
         color => cyan_color,
