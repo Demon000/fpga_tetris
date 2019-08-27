@@ -75,4 +75,4 @@ package graphics is
         g => "0000",
         b => "0000"
     );
-end graphics;
+end package graphics;

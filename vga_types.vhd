@@ -24,4 +24,4 @@ package vga_config is
         vbp_length => 38,
         vview_length => 1024
     );
-end vga_config;
+end package vga_config;
