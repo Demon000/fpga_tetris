@@ -137,13 +137,34 @@ begin
             -- Blank everything by default
             should_blank := true;
 
-            if draw_circle((320, 380), 100, ("1111", "1111", "1111")) then
+            if draw_rectangle((10, 10), (30, 30), cyan_color) then
                 should_blank := false;
             end if;
 
-            if draw_rectangle((400, 100), (500, 400), ("1100", "0011", "0000")) then
+            if draw_rectangle((50, 10), (30, 30), blue_color) then
                 should_blank := false;
             end if;
+
+            if draw_rectangle((90, 10), (30, 30), orange_color) then
+                should_blank := false;
+            end if;
+
+            if draw_rectangle((130, 10), (30, 30), yellow_color) then
+                should_blank := false;
+            end if;
+
+            if draw_rectangle((170, 10), (30, 30), green_color) then
+                should_blank := false;
+            end if;
+
+            if draw_rectangle((210, 10), (30, 30), magenta_color) then
+                should_blank := false;
+            end if;
+
+            if draw_rectangle((250, 10), (30, 30), red_color) then
+                should_blank := false;
+            end if;
+
 
             if should_blank then
                 draw_point_color <= black_color;
