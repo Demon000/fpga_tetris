@@ -157,7 +157,7 @@ begin
         end if;
     end function draw_rectangle;
 
-    variable should_blank : boolean;
+    variable should_blank : boolean := true;
     begin
         if rising_edge(pixel_clock) then
             -- Blank everything by default
