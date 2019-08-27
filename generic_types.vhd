@@ -30,35 +30,35 @@ package graphics is
     -- 00f0f0
     constant cyan_color : rgb_color := (
         r => "0000",
-        g => "1100",
-        b => "1100"
+        g => "1111",
+        b => "1111"
     );
 
     -- 0000f0
     constant blue_color : rgb_color := (
         r => "0000",
         g => "0000",
-        b => "1100"
+        b => "1111"
     );
 
     -- f0a000
     constant orange_color : rgb_color := (
-        r => "1100",
+        r => "1111",
         g => "1010",
         b => "0000"
     );
 
     -- f0f000
     constant yellow_color : rgb_color := (
-        r => "1100",
-        g => "1100",
+        r => "1111",
+        g => "1111",
         b => "0000"
     );
 
     -- 00f000
     constant green_color : rgb_color := (
         r => "0000",
-        g => "1100",
+        g => "1111",
         b => "0000"
     );
 
@@ -66,12 +66,12 @@ package graphics is
     constant magenta_color : rgb_color := (
         r => "1010",
         g => "0000",
-        b => "1100"
+        b => "1111"
     );
 
     -- f00000
     constant red_color : rgb_color := (
-        r => "1100",
+        r => "1111",
         g => "0000",
         b => "0000"
     );
