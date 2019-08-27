@@ -13,11 +13,10 @@ package graphics is
     );
 
     subtype single_color is STD_LOGIC_VECTOR(3 downto 0);
-
     type rgb_color is record
-        r : STD_LOGIC_VECTOR(3 downto 0);
-        g : STD_LOGIC_VECTOR(3 downto 0);
-        b : STD_LOGIC_VECTOR(3 downto 0);
+        r : single_color;
+        g : single_color;
+        b : single_color;
     end record rgb_color;
 
     -- 000000
