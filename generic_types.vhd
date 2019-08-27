@@ -70,7 +70,7 @@ package graphics is
     );
 
     -- f00000
-    constant magenta_color : rgb_color := (
+    constant red_color : rgb_color := (
         r => "1100",
         g => "0000",
         b => "0000"
