@@ -27,60 +27,29 @@ package graphics is
             return boolean;
 
     -- 000000
-    constant black_color : rgb_color := (
-        r => "0000",
-        g => "0000",
-        b => "0000"
-    );
+    constant black_color : rgb_color := ("0000", "0000", "0000");
 
     -- 00f0f0
-    constant cyan_color : rgb_color := (
-        r => "0000",
-        g => "1111",
-        b => "1111"
-    );
+    constant cyan_color : rgb_color := ("0000", "1111", "1111");
 
     -- 0000f0
-    constant blue_color : rgb_color := (
-        r => "0000",
-        g => "0000",
-        b => "1111"
-    );
+    constant blue_color : rgb_color := ("0000", "0000", "1111");
 
     -- f0a000
-    constant orange_color : rgb_color := (
-        r => "1111",
-        g => "1010",
-        b => "0000"
-    );
+    constant orange_color : rgb_color := ("1111", "1010", "0000");
 
     -- f0f000
-    constant yellow_color : rgb_color := (
-        r => "1111",
-        g => "1111",
-        b => "0000"
-    );
+    constant yellow_color : rgb_color := ("1111", "1111", "0000");
 
     -- 00f000
-    constant green_color : rgb_color := (
-        r => "0000",
-        g => "1111",
-        b => "0000"
-    );
+    constant green_color : rgb_color := ("0000", "1111", "0000");
 
     -- a000f0
-    constant magenta_color : rgb_color := (
-        r => "1010",
-        g => "0000",
-        b => "1111"
-    );
+    constant magenta_color : rgb_color := ("1010", "0000", "1111");
 
     -- f00000
-    constant red_color : rgb_color := (
-        r => "1111",
-        g => "0000",
-        b => "0000"
-    );
+    constant red_color : rgb_color := ("1111", "0000", "0000");
+
 end package graphics;
 package body graphics is
     function is_point_in_rectangle(
