@@ -100,36 +100,6 @@ begin
     );
 
     process(pixel_clock)
-    function is_point_in_circle(
-            point : in point_2d;
-            center : in point_2d;
-            radius : in integer)
-        return boolean is
-        variable x_diff : integer;
-        variable y_diff : integer;
-    begin
-        x_diff := point.x - center.x;
-        y_diff := point.y - center.y;
-        if (x_diff ** 2 + y_diff ** 2) < (radius ** 2) then
-            return true;
-        else
-            return false;
-        end if;
-    end function is_point_in_circle;
-
-    impure function draw_circle(
-            center : in point_2d;
-            radius : in integer;
-            fill_color : in rgb_color)
-        return boolean is
-    begin
-        if is_point_in_circle(draw_point, center, radius) then
-            draw_point_color <= fill_color;
-            return true;
-        else
-            return false;
-        end if;
-    end function draw_circle;
 
     function is_point_in_rectangle(
             point : in point_2d;
