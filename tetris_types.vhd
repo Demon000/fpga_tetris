@@ -8,6 +8,7 @@ package game is
     subtype piece_color is natural range 0 to 5;
     subtype piece_class is natural range 0 to 5;
     subtype piece_rotation is natural range 0 to 3;
+    subtype tetris_level is natural range 1 to 10;
 
     type tetris_table_data is array(0 to 21, 0 to 9) of piece_color;
 
