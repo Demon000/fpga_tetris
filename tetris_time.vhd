@@ -2,16 +2,16 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 library tetris_types;
-use tetris_types.game.all;
+use tetris_types.tetris_types.all;
 
-package game is
+package tetris_time is
     function get_fall_ticks_for_level(
             level : tetris_level;
             tps : natural)
         return natural;
-end package game;
+end package tetris_time;
 
-package body game is
+package body tetris_time is
     function get_fall_ticks_for_level(
             level : tetris_level;
             tps : natural)
@@ -33,4 +33,4 @@ package body game is
 
          return ticks;
      end function get_fall_ticks_for_level;
-end package body game;
+end package body tetris_time;
