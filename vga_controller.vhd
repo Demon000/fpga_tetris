@@ -15,7 +15,7 @@ port(
     clock: in STD_LOGIC;
     hsync : out STD_LOGIC;
     vsync : out STD_LOGIC;
-    draw_point : out point_2d
+    point : out point_2d
 );
 end vga_controller;
 
@@ -102,11 +102,11 @@ begin
         if rising_edge(clock) then
             if stream.x >= hview_start and stream.x < hview_end and
                     stream.y >= vview_start and stream.y < vview_end then
-                draw_point.x <= stream.x - hview_start;
-                draw_point.y <= stream.y - vview_start;
+                point.x <= stream.x - hview_start;
+                point.y <= stream.y - vview_start;
             else
-                draw_point.x <= -1;
-                draw_point.y <= -1;
+                point.x <= -1;
+                point.y <= -1;
             end if;
         end if;
     end process; 
