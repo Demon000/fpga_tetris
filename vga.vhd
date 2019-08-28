@@ -85,13 +85,6 @@ constant tetris_table_view_box : view_box := (
     h => 800
 );
 
-constant tetris_table1_view_box : view_box := (
-    x => 300,
-    y => 700,
-    w => 300,
-    h => 300
-);
-
 -- Clock that drives the VGA Controller
 signal pixel_clock : STD_LOGIC;
 
@@ -99,12 +92,8 @@ signal pixel_clock : STD_LOGIC;
 signal global_view_point : point_2d := point_2d_init;
 signal global_view_color : rgb_color := black_color;
 
-
 signal tetris_table_view_point : point_2d := point_2d_init;
 signal tetris_table_view_color : rgb_color := black_color;
-
-signal tetris_table1_view_point : point_2d := point_2d_init;
-signal tetris_table1_view_color : rgb_color := black_color;
 
 begin
     clk_div_inst : clk_wiz_0
@@ -124,17 +113,14 @@ begin
 
     view_controller_inst : view_controller
     generic map(
-        view0_box => tetris_table_view_box,
-        view1_box => tetris_table1_view_box
+        view0_box => tetris_table_view_box
     )
     port map(
         clock => pixel_clock,
         global_view_point => global_view_point,
         global_view_color => global_view_color,
         view0_point => tetris_table_view_point,
-        view1_point => tetris_table1_view_point,
-        view0_color => tetris_table_view_color,
-        view1_color => tetris_table1_view_color
+        view0_color => tetris_table_view_color
     );
 
     tetris_table_0 : tetris_table
@@ -146,17 +132,6 @@ begin
         point => tetris_table_view_point,
         color => tetris_table_view_color,
         chosen_color => yellow_color
-    );
-
-    tetris_table_1 : tetris_table
-    generic map(
-        size => (tetris_table1_view_box.w, tetris_table1_view_box.h)
-    )
-    port map(
-        clock => pixel_clock,
-        point => tetris_table1_view_point,
-        color => tetris_table1_view_color,
-        chosen_color => red_color
     );
 
     red <= global_view_color.r;
