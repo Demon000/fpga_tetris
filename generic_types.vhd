@@ -2,11 +2,22 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 package graphics is
-    type vector_2d is record
+    type point_2d is record
         x : integer;
         y : integer;
-    end record vector_2d;
-    subtype point_2d is vector_2d;
+    end record point_2d;
+
+    type size_2d is record
+        w : integer;
+        h : integer;
+    end record size_2d;
+
+    type view_box is record
+        x : integer;
+        y : integer;
+        w : integer;
+        h : integer;
+    end record view_box;
 
     constant point_2d_init : point_2d := (
         x => -1,
@@ -23,7 +34,7 @@ package graphics is
     function is_point_in_rectangle(
                 point : in point_2d;
                 top_left_point : in point_2d;
-                rectangle_length : in vector_2d)
+                rectangle_size : in size_2d)
             return boolean;
 
     -- 000000
@@ -55,13 +66,13 @@ package body graphics is
     function is_point_in_rectangle(
             point : in point_2d;
             top_left_point : in point_2d;
-            rectangle_length : in vector_2d)
+            rectangle_size : in size_2d)
         return boolean is
     begin
         if point.x > top_left_point.x and
-                point.x < top_left_point.x + rectangle_length.x and
+                point.x < top_left_point.x + rectangle_size.w and
                 point.y > top_left_point.y and
-                point.y < top_left_point.y + rectangle_length.y then
+                point.y < top_left_point.y + rectangle_size.h then
             return true;
         else
             return false;
