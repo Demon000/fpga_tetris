@@ -9,6 +9,8 @@ use generic_types.generic_types.all;
 library vga_types;
 use vga_types.vga_config.all;
 
+library tetris_types;
+use tetris_types.tetris_types.all;
 
 entity vga is
 port(
@@ -17,10 +19,7 @@ port(
     green : out single_color;
     blue : out single_color;
     vsync : out STD_LOGIC;
-    hsync: out STD_LOGIC;
-    count_button : in STD_LOGIC;
-    reset_button : in STD_LOGIC;
-    display_leds : out STD_LOGIC_VECTOR(3 downto 0)
+    hsync: out STD_LOGIC
 );
 end vga;
 
@@ -43,44 +42,69 @@ port(
     clock: in STD_LOGIC;
     hsync : out STD_LOGIC;
     vsync : out STD_LOGIC;
-    draw_point : out point_2d
+    point : out point_2d
 );
 end component;
 
--- Button Debouncer component
-component button_debouncer is
+-- View Controller component
+component view_controller is
 generic(
-    max_button_count : natural := 10000000
+    view0_box : view_box := view_box_init;
+    view1_box : view_box := view_box_init
 );
 port(
-    clock: in STD_LOGIC;
-    button : in STD_LOGIC;
-    button_state : out STD_LOGIC
+    clock : in STD_LOGIC;
+    global_view_point : in point_2d;
+    global_view_color : out rgb_color;
+    view0_point : out point_2d;
+    view1_point : out point_2d;
+    view0_color : in rgb_color := black_color;
+    view1_color : in rgb_color := black_color
+
 );
 end component;
 
--- Button Pulser component
-component button_pulser is
+-- Tetris table component
+component tetris_table is
+generic(
+    size : size_2d
+);
 port(
-    clock: in STD_LOGIC;
-    button_state : in STD_LOGIC := '0';
-    button_press : out STD_LOGIC := '0'
+    clock : in STD_LOGIC;
+    point : in point_2d;
+    color : out rgb_color;
+    chosen_color : in rgb_color
 );
 end component;
+
+-- Tetris table view
+constant tetris_table_view_box : view_box := (
+    x => 0,
+    y => 0,
+    w => 400,
+    h => 800
+);
+
+constant tetris_table1_view_box : view_box := (
+    x => 300,
+    y => 700,
+    w => 300,
+    h => 300
+);
 
 -- Clock that drives the VGA Controller
 signal pixel_clock : STD_LOGIC;
 
 -- Position of the drawing beam
-signal draw_point : point_2d := point_2d_init;
-signal draw_point_color : rgb_color := black_color;
+signal global_view_point : point_2d := point_2d_init;
+signal global_view_color : rgb_color := black_color;
 
-signal count_button_state : STD_LOGIC;
-signal count_button_press : STD_LOGIC;
 
-signal reset_button_state : STD_LOGIC;
-signal reset_button_press : STD_LOGIC;
-signal count_value : STD_LOGIC_VECTOR(3 downto 0) := "0000";
+signal tetris_table_view_point : point_2d := point_2d_init;
+signal tetris_table_view_color : rgb_color := black_color;
+
+signal tetris_table1_view_point : point_2d := point_2d_init;
+signal tetris_table1_view_color : rgb_color := black_color;
 
 begin
     clk_div_inst : clk_wiz_0
@@ -95,113 +119,47 @@ begin
         clock => pixel_clock,
         hsync => hsync,
         vsync => vsync,
-        draw_point => draw_point
+        point => global_view_point
     );
 
-    count_button_debouncer : button_debouncer
+    view_controller_inst : view_controller
+    generic map(
+        view0_box => tetris_table_view_box,
+        view1_box => tetris_table1_view_box
+    )
     port map(
-        clock => system_clock,
-        button => count_button,
-        button_state => count_button_state
+        clock => pixel_clock,
+        global_view_point => global_view_point,
+        global_view_color => global_view_color,
+        view0_point => tetris_table_view_point,
+        view1_point => tetris_table1_view_point,
+        view0_color => tetris_table_view_color,
+        view1_color => tetris_table1_view_color
     );
 
-    count_button_pulser : button_pulser
+    tetris_table_0 : tetris_table
+    generic map(
+        size => (tetris_table_view_box.w, tetris_table_view_box.h)
+    )
     port map(
-        clock => system_clock,
-        button_state => count_button_state,
-        button_press => count_button_press
+        clock => pixel_clock,
+        point => tetris_table_view_point,
+        color => tetris_table_view_color,
+        chosen_color => yellow_color
     );
 
-    reset_button_debouncer : button_debouncer
+    tetris_table_1 : tetris_table
+    generic map(
+        size => (tetris_table1_view_box.w, tetris_table1_view_box.h)
+    )
     port map(
-        clock => system_clock,
-        button => reset_button,
-        button_state => reset_button_state
+        clock => pixel_clock,
+        point => tetris_table1_view_point,
+        color => tetris_table1_view_color,
+        chosen_color => red_color
     );
 
-    reset_button_pulser : button_pulser
-    port map(
-        clock => system_clock,
-        button_state => reset_button_state,
-        button_press => reset_button_press
-    );
-
-    process(pixel_clock)
-
-    impure function draw_rectangle(
-            top_left_point : in point_2d;
-            rectangle_length : in vector_2d;
-            fill_color : in rgb_color)
-        return boolean is
-    begin
-        if is_point_in_rectangle(draw_point, top_left_point, rectangle_length) then
-            draw_point_color <= fill_color;
-            return true;
-        else
-            return false;
-        end if;
-    end function draw_rectangle;
-
-    variable should_blank : boolean := true;
-    begin
-        if rising_edge(pixel_clock) then
-            -- Blank everything by default
-            should_blank := true;
-
-            if draw_rectangle((10, 10), (30, 30), cyan_color) then
-                should_blank := false;
-            end if;
-
-            if draw_rectangle((50, 10), (30, 30), blue_color) then
-                should_blank := false;
-            end if;
-
-            if draw_rectangle((90, 10), (30, 30), orange_color) then
-                should_blank := false;
-            end if;
-
-            if draw_rectangle((130, 10), (30, 30), yellow_color) then
-                should_blank := false;
-            end if;
-
-            if draw_rectangle((170, 10), (30, 30), green_color) then
-                should_blank := false;
-            end if;
-
-            if draw_rectangle((210, 10), (30, 30), magenta_color) then
-                should_blank := false;
-            end if;
-
-            if draw_rectangle((250, 10), (30, 30), red_color) then
-                should_blank := false;
-            end if;
-
-            if should_blank then
-                draw_point_color <= black_color;
-            end if;
-        end if;
-    end process;
-
-    process(system_clock)
-    begin
-        if rising_edge(system_clock) then
-            if count_button_press = '1' then
-                if count_value = "1111" then
-                    count_value <= "0000";
-                else
-                    count_value <= count_value + '1';
-                end if;
-            end if;
-
-            if reset_button_press = '1' then
-                count_value <= "0000";
-            end if;
-        end if;
-    end process;
-
-    display_leds <= count_value;
-
-    red <= draw_point_color.r;
-    green <= draw_point_color.g;
-    blue <= draw_point_color.b;
+    red <= global_view_color.r;
+    green <= global_view_color.g;
+    blue <= global_view_color.b;
 end main;
