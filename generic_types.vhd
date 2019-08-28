@@ -12,26 +12,12 @@ package generic_types is
         h : integer;
     end record size_2d;
 
-    type view_box is record
-        x : integer;
-        y : integer;
-        w : integer;
-        h : integer;
-    end record view_box;
-
     constant point_2d_init : point_2d := (
         x => -1,
         y => -1
     );
 
     constant size_2d_init : size_2d := (
-        w => 0,
-        h => 0
-    );
-
-    constant view_box_init : view_box := (
-        x => -1,
-        y => -1,
         w => 0,
         h => 0
     );

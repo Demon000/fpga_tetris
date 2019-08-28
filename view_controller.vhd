@@ -8,24 +8,18 @@ use generic_types.generic_types.all;
 
 entity view_controller is
 generic(
-    view0_box : view_box := view_box_init;
-    view1_box : view_box := view_box_init
+    view0_position : point_2d := point_2d_init;
+    view0_size : size_2d := size_2d_init;
+    view1_position : point_2d := point_2d_init;
+    view1_size : size_2d := size_2d_init
 );
 port(
     clock : in STD_LOGIC;
-    
-    -- The point we are drawing on the screen
     global_view_point : in point_2d;
-
-    -- The color we draw on the screen
     global_view_color : out rgb_color;
-
-    -- The points that the view receive
     view0_point : out point_2d;
-    view1_point : out point_2d;
-    
-    -- The colors that we get back from the view
     view0_color : in rgb_color := black_color;
+    view1_point : out point_2d;
     view1_color : in rgb_color := black_color
 
 );
@@ -34,21 +28,21 @@ end view_controller;
 architecture main of view_controller is
 
 begin
-    view0_point <= (global_view_point.x - view0_box.x, global_view_point.y - view0_box.y);
-    view1_point <= (global_view_point.x - view1_box.x, global_view_point.y - view1_box.y);   
+    view0_point <= (global_view_point.x - view0_position.x, global_view_point.y - view0_position.y);
+    view1_point <= (global_view_point.x - view1_position.x, global_view_point.y - view1_position.y);
  
     process(clock)
     begin
         if rising_edge(clock) then
-            if global_view_point.x >= view0_box.x and
-                    global_view_point.y >= view0_box.y and
-                    global_view_point.x < view0_box.x + view0_box.w and
-                    global_view_point.y < view0_box.y + view0_box.h then
+            if global_view_point.x >= view0_position.x and
+                    global_view_point.y >= view0_position.y and
+                    global_view_point.x < view0_position.x + view0_size.w and
+                    global_view_point.y < view0_position.y + view0_size.h then
                 global_view_color <= view0_color;
-            elsif global_view_point.x >= view1_box.x and
-                    global_view_point.y >= view1_box.y and
-                    global_view_point.x < view1_box.x + view1_box.w and
-                    global_view_point.y < view1_box.y + view1_box.h then
+            elsif global_view_point.x >= view1_position.x and
+                    global_view_point.y >= view1_position.y and
+                    global_view_point.x < view1_position.x + view1_size.w and
+                    global_view_point.y < view1_position.y + view1_size.h then
                 global_view_color <= view1_color;
             else
                 global_view_color <= black_color;

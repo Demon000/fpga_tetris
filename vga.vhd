@@ -49,18 +49,19 @@ end component;
 -- View Controller component
 component view_controller is
 generic(
-    view0_box : view_box := view_box_init;
-    view1_box : view_box := view_box_init
+    view0_position : point_2d := point_2d_init;
+    view0_size : size_2d := size_2d_init;
+    view1_position : point_2d := point_2d_init;
+    view1_size : size_2d := size_2d_init
 );
 port(
     clock : in STD_LOGIC;
     global_view_point : in point_2d;
     global_view_color : out rgb_color;
     view0_point : out point_2d;
-    view1_point : out point_2d;
     view0_color : in rgb_color := black_color;
+    view1_point : out point_2d;
     view1_color : in rgb_color := black_color
-
 );
 end component;
 
@@ -78,9 +79,12 @@ port(
 end component;
 
 -- Tetris table view
-constant tetris_table_view_box : view_box := (
+constant tetris_table_position : point_2d := (
     x => 0,
-    y => 0,
+    y => 0
+);
+
+constant tetris_table_size : size_2d := (
     w => 400,
     h => 800
 );
@@ -113,7 +117,8 @@ begin
 
     view_controller_inst : view_controller
     generic map(
-        view0_box => tetris_table_view_box
+        view0_position => tetris_table_position,
+        view0_size => tetris_table_size
     )
     port map(
         clock => pixel_clock,
@@ -125,7 +130,7 @@ begin
 
     tetris_table_0 : tetris_table
     generic map(
-        size => (tetris_table_view_box.w, tetris_table_view_box.h)
+        size => tetris_table_size
     )
     port map(
         clock => pixel_clock,
