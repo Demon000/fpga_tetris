@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 library generic_types;
-use generic_types.graphics.all;
+use generic_types.generic_types.all;
 
 library tetris_types;
 use tetris_types.tetris_types.all;
