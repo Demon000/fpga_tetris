@@ -24,6 +24,18 @@ package generic_types is
         y => -1
     );
 
+    constant size_2d_init : size_2d := (
+        w => 0,
+        h => 0
+    );
+
+    constant view_box_init : view_box := (
+        x => -1,
+        y => -1,
+        w => 0,
+        h => 0
+    );
+
     subtype single_color is STD_LOGIC_VECTOR(3 downto 0);
     type rgb_color is record
         r : single_color;
