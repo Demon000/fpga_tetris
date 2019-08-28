@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-package graphics is
+package generic_types is
     type point_2d is record
         x : integer;
         y : integer;
@@ -61,8 +61,8 @@ package graphics is
     -- f00000
     constant red_color : rgb_color := ("1111", "0000", "0000");
 
-end package graphics;
-package body graphics is
+end package generic_types;
+package body generic_types is
     function is_point_in_rectangle(
             point : in point_2d;
             top_left_point : in point_2d;
@@ -78,4 +78,4 @@ package body graphics is
             return false;
         end if;
     end function is_point_in_rectangle;
-end package body graphics;
+end package body generic_types;

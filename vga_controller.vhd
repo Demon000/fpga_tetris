@@ -2,10 +2,10 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 library vga_types;
-use vga_types.vga_config.ALL;
+use vga_types.vga_config.all;
 
 library generic_types;
-use generic_types.graphics.ALL;
+use generic_types.generic_types.all;
 
 entity vga_controller is
 generic(

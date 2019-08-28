@@ -3,11 +3,12 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
+library generic_types;
+use generic_types.generic_types.all;
+
 library vga_types;
 use vga_types.vga_config.all;
 
-library generic_types;
-use generic_types.graphics.all;
 
 entity vga is
 port(
