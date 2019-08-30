@@ -2,14 +2,16 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 package generic_types is
+    subtype point_int is integer range -2048 to 2047;
     type point_2d is record
-        x : integer;
-        y : integer;
+        x : point_int;
+        y : point_int;
     end record point_2d;
 
+    subtype size_nat is natural range 0 to 2047;
     type size_2d is record
-        w : integer;
-        h : integer;
+        w : size_nat;
+        h : size_nat;
     end record size_2d;
 
     constant point_2d_init : point_2d := (

@@ -25,7 +25,11 @@ package tetris_pieces is
         third_rotation_id
     );
 
-    type piece_table_data is array(0 to 3, 0 to 3) of bit;
+    constant piece_table_size : size_2d := (4, 4);
+    type piece_table_data is array(
+        0 to piece_table_size.h - 1,
+        0 to piece_table_size.w - 1
+    ) of bit;
     type tetris_piece is record
         table_0 : piece_table_data;
         table_90 : piece_table_data;
