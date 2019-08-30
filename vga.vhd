@@ -64,7 +64,8 @@ end component;
 -- Tetris table component
 component tetris_table is
 generic(
-    size : size_2d
+    size : size_2d;
+    tps : natural
 );
 port(
     clock : in STD_LOGIC;
@@ -73,26 +74,21 @@ port(
 );
 end component;
 
--- Tetris table view
-constant tetris_table_position : point_2d := (
-    x => 0,
-    y => 0
-);
-
-constant tetris_table_size : size_2d := (
-    w => 400,
-    h => 800
-);
-
 -- Clock that drives the VGA Controller
+constant pixel_clock_tps : natural := 108108108;
 signal pixel_clock : STD_LOGIC;
 
--- Position of the drawing beam
-signal global_view_point : point_2d := point_2d_init;
-signal global_view_color : rgb_color := black_color;
+-- Position and color of the drawing beam
+signal global_view_point : point_2d;
+signal global_view_color : rgb_color;
 
-signal tetris_table_view_point : point_2d := point_2d_init;
-signal tetris_table_view_color : rgb_color := black_color;
+-- Position and size of the tetris table view
+constant tetris_table_position : point_2d := (200, 200);
+constant tetris_table_size : size_2d := (400, 800);
+
+-- Position and color of the tetris table view drawing beam
+signal tetris_table_view_point : point_2d;
+signal tetris_table_view_color : rgb_color;
 
 begin
     clk_div_inst : clk_wiz_0
@@ -125,7 +121,8 @@ begin
 
     tetris_table_0 : tetris_table
     generic map(
-        size => tetris_table_size
+        size => tetris_table_size,
+        tps => pixel_clock_tps
     )
     port map(
         clock => pixel_clock,
