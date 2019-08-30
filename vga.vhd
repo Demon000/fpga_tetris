@@ -64,8 +64,7 @@ end component;
 -- Tetris table component
 component tetris_table is
 generic(
-    size : size_2d;
-    tps : natural
+    config : tetris_config
 );
 port(
     clock : in STD_LOGIC;
@@ -75,7 +74,6 @@ port(
 end component;
 
 -- Clock that drives the VGA Controller
-constant pixel_clock_tps : natural := 108108108;
 signal pixel_clock : STD_LOGIC;
 
 -- Position and color of the drawing beam
@@ -83,12 +81,15 @@ signal global_view_point : point_2d;
 signal global_view_color : rgb_color;
 
 -- Position and size of the tetris table view
-constant tetris_table_position : point_2d := (200, 200);
+constant tetris_table_position : point_2d := (100, 100);
 constant tetris_table_size : size_2d := (400, 800);
 
 -- Position and color of the tetris table view drawing beam
 signal tetris_table_view_point : point_2d;
 signal tetris_table_view_color : rgb_color;
+
+constant used_vga_config : vga_config := vga_config_1280_1024_60;
+constant used_tetris_config : tetris_config := tetris_config_1280_1024_60;
 
 begin
     clk_div_inst : clk_wiz_0
@@ -98,7 +99,7 @@ begin
     );
 
     vga_controller_inst : vga_controller
-    generic map(vga_config_1280_1024_60)
+    generic map(used_vga_config)
     port map(
         clock => pixel_clock,
         hsync => hsync,
@@ -106,10 +107,20 @@ begin
         point => global_view_point
     );
 
+    tetris_table_0 : tetris_table
+    generic map(
+        config => used_tetris_config
+    )
+    port map(
+        clock => pixel_clock,
+        point => tetris_table_view_point,
+        color => tetris_table_view_color
+    );
+
     view_controller_inst : view_controller
     generic map(
-        view0_position => tetris_table_position,
-        view0_size => tetris_table_size
+        view0_position => used_tetris_config.table_position,
+        view0_size => used_tetris_config.table_size
     )
     port map(
         clock => pixel_clock,
@@ -117,17 +128,6 @@ begin
         global_view_color => global_view_color,
         view0_point => tetris_table_view_point,
         view0_color => tetris_table_view_color
-    );
-
-    tetris_table_0 : tetris_table
-    generic map(
-        size => tetris_table_size,
-        tps => pixel_clock_tps
-    )
-    port map(
-        clock => pixel_clock,
-        point => tetris_table_view_point,
-        color => tetris_table_view_color
     );
 
     red <= global_view_color.r;

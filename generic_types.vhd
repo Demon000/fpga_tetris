@@ -61,6 +61,9 @@ package generic_types is
     -- f00000
     constant red_color : rgb_color := ("1111", "0000", "0000");
 
+    -- f0f0f0
+    constant white_color : rgb_color := ("1111", "1111", "1111");
+
 end package generic_types;
 package body generic_types is
     function is_point_in_rectangle(

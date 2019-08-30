@@ -23,18 +23,10 @@ end view_controller;
 architecture main of view_controller is
 begin
     view0_point <= (global_view_point.x - view0_position.x, global_view_point.y - view0_position.y);
- 
-    process(clock)
-    begin
-        if rising_edge(clock) then
-            if global_view_point.x >= view0_position.x and
-                    global_view_point.y >= view0_position.y and
-                    global_view_point.x < view0_position.x + view0_size.w and
-                    global_view_point.y < view0_position.y + view0_size.h then
-                global_view_color <= view0_color;
-            else
-                global_view_color <= black_color;
-            end if;
-        end if;
-    end process;
+    global_view_color <=
+            view0_color when global_view_point.x >= view0_position.x and
+            global_view_point.y >= view0_position.y and
+            global_view_point.x < view0_position.x + view0_size.w and
+            global_view_point.y < view0_position.y + view0_size.h else
+            black_color;
 end main;
