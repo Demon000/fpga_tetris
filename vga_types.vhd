@@ -1,17 +1,19 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-package vga_config is
-    type vga_config is record
-        hfp_length : natural;
-        hsync_length : natural;
-        hbp_length : natural;
-        hview_length : natural;
+package vga_types is
+    subtype vga_integer is natural range 0 to 2047;
 
-        vfp_length : natural;
-        vsync_length : natural;
-        vbp_length : natural;
-        vview_length : natural;
+    type vga_config is record
+        hfp_length : vga_integer;
+        hsync_length : vga_integer;
+        hbp_length : vga_integer;
+        hview_length : vga_integer;
+
+        vfp_length : vga_integer;
+        vsync_length : vga_integer;
+        vbp_length : vga_integer;
+        vview_length : vga_integer;
     end record vga_config;
 
     constant vga_config_1280_1024_60 : vga_config := (
@@ -24,4 +26,4 @@ package vga_config is
         vbp_length => 38,
         vview_length => 1024
     );
-end package vga_config;
+end package vga_types;

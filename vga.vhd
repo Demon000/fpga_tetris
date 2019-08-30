@@ -7,7 +7,7 @@ library generic_types;
 use generic_types.generic_types.all;
 
 library vga_types;
-use vga_types.vga_config.all;
+use vga_types.vga_types.all;
 
 library tetris_types;
 use tetris_types.tetris_types.all;

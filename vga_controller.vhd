@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 library vga_types;
-use vga_types.vga_config.all;
+use vga_types.vga_types.all;
 
 library generic_types;
 use generic_types.generic_types.all;
@@ -21,38 +21,38 @@ end vga_controller;
 
 architecture main of vga_controller is
 -- Pixel values for each horizontal screen area
-constant hdraw_start : natural := 0;
+constant hdraw_start : vga_integer := 0;
 
-constant hfp_start : natural := hdraw_start;
-constant hfp_end : natural := hfp_start + config.hfp_length;
+constant hfp_start : vga_integer := hdraw_start;
+constant hfp_end : vga_integer := hfp_start + config.hfp_length;
 
-constant hsync_start : natural := hfp_end;
-constant hsync_end : natural := hsync_start + config.hsync_length;
+constant hsync_start : vga_integer := hfp_end;
+constant hsync_end : vga_integer := hsync_start + config.hsync_length;
 
-constant hbp_start : natural := hsync_end;
-constant hbp_end : natural := hbp_start + config.hbp_length;
+constant hbp_start : vga_integer := hsync_end;
+constant hbp_end : vga_integer := hbp_start + config.hbp_length;
 
-constant hview_start : natural := hbp_end;
-constant hview_end : natural := hview_start + config.hview_length;
+constant hview_start : vga_integer := hbp_end;
+constant hview_end : vga_integer := hview_start + config.hview_length;
 
-constant hdraw_end : natural := hview_end;
+constant hdraw_end : vga_integer := hview_end;
 
 -- Pixel values for each vertical screen area
-constant vdraw_start : natural := 0;
+constant vdraw_start : vga_integer := 0;
 
-constant vfp_start : natural := vdraw_start;
-constant vfp_end : natural := vfp_start + config.vfp_length;
+constant vfp_start : vga_integer := vdraw_start;
+constant vfp_end : vga_integer := vfp_start + config.vfp_length;
 
-constant vsync_start : natural := vfp_end;
-constant vsync_end : natural := vsync_start + config.vsync_length;
+constant vsync_start : vga_integer := vfp_end;
+constant vsync_end : vga_integer := vsync_start + config.vsync_length;
 
-constant vbp_start : natural := vsync_end;
-constant vbp_end : natural := vbp_start + config.vbp_length;
+constant vbp_start : vga_integer := vsync_end;
+constant vbp_end : vga_integer := vbp_start + config.vbp_length;
 
-constant vview_start : natural := vbp_end;
-constant vview_end : natural := vview_start + config.vview_length;
+constant vview_start : vga_integer := vbp_end;
+constant vview_end : vga_integer := vview_start + config.vview_length;
 
-constant vdraw_end : natural := vview_end;
+constant vdraw_end : vga_integer := vview_end;
 
 -- Position of the stream
 signal stream : point_2d := point_2d_init;
