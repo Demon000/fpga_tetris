@@ -66,6 +66,11 @@ package tetris_pieces is
             rotation_id : piece_rotation_id)
         return piece_table_data;
 
+    function is_table_colliding(
+            piece_table : piece_table_data;
+            table : piece_table_data)
+        return boolean;
+
     -- I piece
     constant i_piece : tetris_piece := (
         table_0 => (
@@ -364,4 +369,21 @@ package body tetris_pieces is
 
         return table;
     end function get_rotation_table_by_type_id;
+
+    function is_table_colliding(
+            piece_table : piece_table_data;
+            table : piece_table_data)
+        return boolean is
+        variable collides : boolean := false;
+    begin
+        for i in 0 to piece_table_size.h - 1 loop
+            for j in 0 to piece_table_size.w - 1 loop
+                if piece_table(i, j) = '1' and
+                        table(i, j) = '1' then
+                    collides := true;
+                end if;
+            end loop;
+        end loop;
+        return collides;
+    end function is_table_colliding;
 end package body tetris_pieces;
