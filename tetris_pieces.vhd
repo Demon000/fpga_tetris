@@ -154,6 +154,7 @@ package tetris_pieces is
     constant o_piece_table : piece_table_data := (
         "0110",
         "0110",
+        "0000",
         "0000"
     );
     constant o_piece : tetris_piece := (
