@@ -8,8 +8,8 @@ generic(
 port(
     clock : in STD_LOGIC;
     trigger_ticks : in natural;
-    paused : in boolean := false;
-    restart : in boolean :=  false;
+    paused : in STD_LOGIC := '0';
+    restart : in STD_LOGIC :=  '0';
     pulse : out STD_LOGIC
 );
 end clock_timer;
@@ -20,11 +20,11 @@ begin
     process(clock)
     begin
         if rising_edge(clock) then
-            if restart = true then
+            if restart = '1' then
                 counted_clocks <= 0;
             end if;
 
-            if paused = false then
+            if paused = '0' then
                 if counted_clocks >= trigger_ticks - 1 then
                     pulse <= '1';
                     if restart_on_end = true then
