@@ -15,11 +15,13 @@ use tetris_types.tetris_types.all;
 entity vga is
 port(
     sysclk : in STD_LOGIC;
+    left_button : in STD_LOGIC;
+    right_button : in STD_LOGIC;
     red : out single_color;
     green : out single_color;
     blue : out single_color;
     vsync : out STD_LOGIC;
-    hsync: out STD_LOGIC
+    hsync : out STD_LOGIC
 );
 end vga;
 
@@ -61,6 +63,27 @@ port(
 );
 end component;
 
+-- Button Debouncer component
+component button_debouncer is
+generic(
+    max_button_count : natural := 10000000
+);
+port(
+    clock: in STD_LOGIC;
+    button : in STD_LOGIC := '0';
+    button_state : out STD_LOGIC := '0'
+);
+end component;
+
+-- Button Pulser component
+component button_pulser is
+port(
+    clock: in STD_LOGIC;
+    button_state : in STD_LOGIC := '0';
+    button_press : out STD_LOGIC := '0'
+);
+end component;
+
 -- Tetris table component
 component tetris_table is
 generic(
@@ -69,7 +92,9 @@ generic(
 port(
     clock : in STD_LOGIC;
     point : in point_2d;
-    color : out rgb_color
+    color : out rgb_color;
+    left_button_press : in STD_LOGIC;
+    right_button_press : in STD_LOGIC
 );
 end component;
 
@@ -91,6 +116,12 @@ signal tetris_table_view_color : rgb_color;
 constant used_vga_config : vga_config := vga_config_1280_1024_60;
 constant used_tetris_config : tetris_config := tetris_config_1280_1024_60;
 
+-- Buttons
+signal left_button_state : STD_LOGIC;
+signal left_button_press : STD_LOGIC;
+signal right_button_state : STD_LOGIC;
+signal right_button_press : STD_LOGIC;
+
 begin
     clk_div_inst : clk_wiz_0
     port map(
@@ -107,6 +138,34 @@ begin
         point => global_view_point
     );
 
+    left_button_debouncer : button_debouncer
+    port map(
+        clock => pixel_clock,
+        button => left_button,
+        button_state => left_button_state
+    );
+
+    right_button_debouncer : button_debouncer
+    port map(
+        clock => pixel_clock,
+        button => right_button,
+        button_state => right_button_state
+    );
+
+    left_button_pulser : button_pulser
+    port map(
+        clock => pixel_clock,
+        button_state => left_button_state,
+        button_press => left_button_press
+    );
+
+    right_button_pulser : button_pulser
+    port map(
+        clock => pixel_clock,
+        button_state => right_button_state,
+        button_press => right_button_press
+    );
+
     tetris_table_0 : tetris_table
     generic map(
         config => used_tetris_config
@@ -114,7 +173,9 @@ begin
     port map(
         clock => pixel_clock,
         point => tetris_table_view_point,
-        color => tetris_table_view_color
+        color => tetris_table_view_color,
+        left_button_press => left_button_press,
+        right_button_press => right_button_press
     );
 
     view_controller_inst : view_controller

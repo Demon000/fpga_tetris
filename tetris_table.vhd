@@ -19,7 +19,9 @@ generic(
 port(
     clock : in STD_LOGIC;
     point : in point_2d;
-    color : out rgb_color
+    color : out rgb_color;
+    left_button_press : in STD_LOGIC;
+    right_button_press : in STD_LOGIC
 );
 end tetris_table;
 
@@ -124,6 +126,32 @@ begin
                     write_piece_to_table(falling_piece_position, falling_piece_table, falling_piece_color_id, table);
                     falling_piece_position <= default_falling_piece_position;
                 else
+                    falling_piece_position <= next_position;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    process(clock)
+    variable next_position : tetris_point;
+    begin
+        if rising_edge(clock) then
+            if left_button_press = '1' then
+                next_position := (falling_piece_position.x - 1, falling_piece_position.y);
+                if not is_table_colliding(next_position, falling_piece_table, table) then
+                    falling_piece_position <= next_position;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    process(clock)
+    variable next_position : tetris_point;
+    begin
+        if rising_edge(clock) then
+            if right_button_press = '1' then
+                next_position := (falling_piece_position.x + 1, falling_piece_position.y);
+                if not is_table_colliding(next_position, falling_piece_table, table) then
                     falling_piece_position <= next_position;
                 end if;
             end if;
