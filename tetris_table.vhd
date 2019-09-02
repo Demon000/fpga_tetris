@@ -147,8 +147,8 @@ begin
         if rising_edge(clock) then
             falling_piece_table := get_rotation_table_by_type_id(falling_piece_type_id, falling_piece_rotation_id);
 
+            next_position := (falling_piece_position.x, falling_piece_position.y + 1);
             if falling_triggered = '1' then
-                next_position := (falling_piece_position.x, falling_piece_position.y + 1);
                 if is_table_colliding(next_position, falling_piece_table, table) then
                     falling_piece_color_id := get_color_id_by_type_id(falling_piece_type_id);
                     write_piece_to_table(falling_piece_position, falling_piece_table, falling_piece_color_id, table);
@@ -159,24 +159,24 @@ begin
                     move_falling_piece_down <= '1';
                     need_new_falling_piece <= '0';
                 end if;
+            else
+                move_falling_piece_down <= '0';
             end if;
 
-            if left_button_press = '1' then
-                next_position := (falling_piece_position.x - 1, falling_piece_position.y);
-                if not is_table_colliding(next_position, falling_piece_table, table) then
-                    move_falling_piece_left <= '1';
-                else
-                    move_falling_piece_left <= '0';
-                end if;
+            next_position := (falling_piece_position.x - 1, falling_piece_position.y);
+            if left_button_press = '1' and
+                    not is_table_colliding(next_position, falling_piece_table, table) then
+                move_falling_piece_left <= '1';
+            else
+                move_falling_piece_left <= '0';
             end if;
 
-            if right_button_press = '1' then
-                next_position := (falling_piece_position.x + 1, falling_piece_position.y);
-                if not is_table_colliding(next_position, falling_piece_table, table) then
-                    move_falling_piece_right <= '1';
-                else
-                    move_falling_piece_right <= '0';
-                end if;
+            next_position := (falling_piece_position.x + 1, falling_piece_position.y);
+            if right_button_press = '1' and
+                    not is_table_colliding(next_position, falling_piece_table, table) then
+                move_falling_piece_right <= '1';
+            else
+                move_falling_piece_right <= '0';
             end if;
         end if;
     end process;
