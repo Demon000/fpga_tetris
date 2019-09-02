@@ -34,8 +34,8 @@ generic(
 port(
     clock : in STD_LOGIC;
     trigger_ticks : in natural;
-    paused : in boolean;
-    restart : in boolean;
+    paused : in boolean := false;
+    restart : in boolean := false;
     pulse : out STD_LOGIC
 );
 end component;
