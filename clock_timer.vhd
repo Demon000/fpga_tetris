@@ -18,7 +18,6 @@ architecture main of clock_timer is
 signal counted_clocks : natural := 0;
 begin
     process(clock)
-    variable last_paused : STD_LOGIC := '0';
     begin
         if rising_edge(clock) then
             if restart = true then
