@@ -73,7 +73,7 @@ end function is_table_colliding;
 procedure write_piece_to_table(
         piece_position : in tetris_point;
         piece_table : in piece_table_data;
-        piece_color_id : in piece_color_id;
+        piece_color_id : in tetris_piece_color_id;
         signal tetris_table : out tetris_table_data) is
 begin
     for i in 0 to piece_table_size.h - 1 loop
@@ -85,7 +85,7 @@ begin
     end loop;
 end procedure write_piece_to_table;
 
-signal table : tetris_table_data := tetris_table_data_init;
+signal table : tetris_table_data := tetris_table_init;
 signal level : tetris_level := tetris_first_level;
 signal need_new_falling_piece : STD_LOGIC;
 signal move_falling_piece_left : STD_LOGIC;
@@ -98,11 +98,11 @@ signal falling_triggered : STD_LOGIC;
 -- Position and size of the block being drawn
 signal block_position : tetris_point;
 
-signal falling_piece_type_id : piece_type_id := s_type_id;
+signal falling_piece_type_id : tetris_piece_type_id := s_type_id;
 signal falling_piece_position : tetris_point := default_falling_piece_position;
 signal falling_piece_rotation_id : piece_rotation_id := normal_rotation_id;
 
-signal block_drawing_color_id : piece_color_id;
+signal block_drawing_color_id : tetris_piece_color_id;
 begin
     falling_trigger_ticks <= config.piece_falling_ticks(level);
 
@@ -141,7 +141,7 @@ begin
 
     process(clock)
     variable next_position : tetris_point;
-    variable falling_piece_color_id : piece_color_id;
+    variable falling_piece_color_id : tetris_piece_color_id;
     variable falling_piece_table : piece_table_data;
     begin
         if rising_edge(clock) then

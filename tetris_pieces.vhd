@@ -8,7 +8,7 @@ library tetris_types;
 use tetris_types.tetris_types.all;
 
 package tetris_pieces is
-    type piece_type_id is (
+    type tetris_piece_type_id is (
         i_type_id,
         j_type_id,
         l_type_id,
@@ -46,23 +46,23 @@ package tetris_pieces is
         return piece_rotation_id;
 
     function get_piece_by_type_id(
-            type_id : piece_type_id)
+            type_id : tetris_piece_type_id)
         return tetris_piece;
 
     function get_color_by_id(
-            color_id : piece_color_id)
+            color_id : tetris_piece_color_id)
         return rgb_color;
 
     function get_color_id_by_type_id(
-            type_id : piece_type_id)
-        return piece_color_id;
+            type_id : tetris_piece_type_id)
+        return tetris_piece_color_id;
 
     function get_color_by_type_id(
-            type_id : piece_type_id)
+            type_id : tetris_piece_type_id)
         return rgb_color;
 
     function get_rotation_table_by_type_id(
-            type_id : piece_type_id;
+            type_id : tetris_piece_type_id;
             rotation_id : piece_rotation_id)
         return piece_table_data;
 
@@ -281,7 +281,7 @@ package body tetris_pieces is
     end function get_prev_rotation;
 
     function get_piece_by_type_id(
-            type_id : piece_type_id)
+            type_id : tetris_piece_type_id)
         return tetris_piece is
     variable piece : tetris_piece;
     begin
@@ -299,7 +299,7 @@ package body tetris_pieces is
     end function get_piece_by_type_id;
 
     function get_color_by_id(
-            color_id : piece_color_id)
+            color_id : tetris_piece_color_id)
         return rgb_color is
     variable color : rgb_color;
     begin
@@ -318,9 +318,9 @@ package body tetris_pieces is
     end function get_color_by_id;
 
     function get_color_id_by_type_id(
-            type_id : piece_type_id)
-        return piece_color_id is
-    variable color_id : piece_color_id;
+            type_id : tetris_piece_type_id)
+        return tetris_piece_color_id is
+    variable color_id : tetris_piece_color_id;
     begin
         case type_id is
             when i_type_id => color_id := i_color_id;
@@ -336,9 +336,9 @@ package body tetris_pieces is
     end function get_color_id_by_type_id;
 
     function get_color_by_type_id(
-            type_id : piece_type_id)
+            type_id : tetris_piece_type_id)
         return rgb_color is
-    variable color_id : piece_color_id;
+    variable color_id : tetris_piece_color_id;
     variable color : rgb_color;
     begin
         color_id := get_color_id_by_type_id(type_id);
@@ -347,7 +347,7 @@ package body tetris_pieces is
     end function get_color_by_type_id;
 
     function get_rotation_table_by_type_id(
-            type_id : piece_type_id;
+            type_id : tetris_piece_type_id;
             rotation_id : piece_rotation_id)
         return piece_table_data is
     variable table : piece_table_data;

@@ -9,10 +9,10 @@ package tetris_types is
     constant tetris_last_level : natural := 10;
     subtype tetris_level is natural range tetris_first_level to tetris_last_level;
 
-    type piece_falling_ticks_data is array(tetris_first_level to tetris_last_level) of natural;
+    type tetris_piece_falling_ticks_data is array(tetris_first_level to tetris_last_level) of natural;
 
     type tetris_config is record
-        piece_falling_ticks : piece_falling_ticks_data;
+        piece_falling_ticks : tetris_piece_falling_ticks_data;
         table_position : point_2d;
         table_size : size_2d;
         block_size : size_2d;
@@ -36,7 +36,7 @@ package tetris_types is
         block_size => (32, 32)
     );
 
-    type piece_color_id is (
+    type tetris_piece_color_id is (
         empty_color_id,
         i_color_id,
         j_color_id,
@@ -65,7 +65,7 @@ package tetris_types is
     type tetris_table_data is array(
         0 to tetris_table_size.h - 1,
         0 to tetris_table_size.w - 1
-    ) of piece_color_id;
+    ) of tetris_piece_color_id;
 
-    constant tetris_table_data_init : tetris_table_data := (others => (others => empty_color_id));
+    constant tetris_table_init : tetris_table_data := (others => (others => empty_color_id));
 end package tetris_types;
