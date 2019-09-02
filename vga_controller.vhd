@@ -102,12 +102,11 @@ begin
         if rising_edge(clock) then
             if stream.x >= hview_start and stream.x < hview_end and
                     stream.y >= vview_start and stream.y < vview_end then
-                point.x <= stream.x - hview_start;
-                point.y <= stream.y - vview_start;
+                point <= (stream.x - hview_start, stream.y - vview_start);
             else
-                point.x <= -1;
-                point.y <= -1;
+                point <= (-1, -1);
             end if;
         end if;
-    end process; 
+    end process;
+
 end main;

@@ -14,7 +14,7 @@ use tetris_types.tetris_types.all;
 
 entity vga is
 port(
-    system_clock : in STD_LOGIC;
+    sysclk : in STD_LOGIC;
     red : out single_color;
     green : out single_color;
     blue : out single_color;
@@ -94,7 +94,7 @@ constant used_tetris_config : tetris_config := tetris_config_1280_1024_60;
 begin
     clk_div_inst : clk_wiz_0
     port map(
-        CLK_IN1 => system_clock,
+        CLK_IN1 => sysclk,
         CLK_OUT1 => pixel_clock
     );
 

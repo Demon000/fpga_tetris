@@ -38,6 +38,56 @@ port(
 );
 end component;
 
+function is_table_colliding(
+        piece_position : tetris_point;
+        piece_table : piece_table_data;
+        tetris_table : tetris_table_data)
+    return boolean is
+begin
+    for i in 0 to piece_table_size.h - 1 loop
+        -- Falling starts from -2, we can't check this
+        --if piece_position.y + i < 0 then
+        --    return true;
+        --end if;
+
+        if piece_position.y + i > config.table_size.h - 1 then
+            return true;
+        end if;
+
+        for j in 0 to piece_table_size.w - 1 loop
+            if piece_table(i, j) = '1' then
+                if piece_position.x + j < 0 then
+                    return true;
+                end if;
+
+                if piece_position.x + j > config.table_size.w - 1 then
+                    return true;
+                end if;
+
+                if tetris_table(piece_position.y + i, piece_position.x + j) /= empty_color_id then
+                    return true;
+                end if;
+            end if;
+        end loop;
+    end loop;
+    return false;
+end function is_table_colliding;
+
+procedure write_piece_to_table(
+        piece_position : in tetris_point;
+        piece_table : in piece_table_data;
+        piece_color_id : in piece_color_id;
+        signal tetris_table : out tetris_table_data) is
+begin
+    for i in 0 to piece_table_size.h - 1 loop
+        for j in 0 to piece_table_size.w - 1 loop
+            if piece_table(i, j) = '1' then
+                tetris_table(piece_position.y + i, piece_position.x + j) <= piece_color_id;
+            end if;
+        end loop;
+    end loop;
+end procedure write_piece_to_table;
+
 signal table : tetris_table_data := tetris_table_data_init;
 signal level : tetris_level := tetris_first_level;
 signal falling_trigger_ticks : natural;
@@ -45,16 +95,16 @@ signal falling_triggered : STD_LOGIC;
 
 -- Position and size of the block being drawn
 signal block_position : tetris_point;
-signal block_relative_pixel_position : point_2d;
 signal piece_relative_block_position : tetris_point;
 
 signal falling_piece_position : tetris_point := default_falling_piece_position;
 signal falling_piece_type_id : piece_type_id := s_type_id;
 signal falling_piece_rotation_id : piece_rotation_id := normal_rotation_id;
+signal falling_piece_color : rgb_color := green_color;
+signal falling_piece_color_id : piece_color_id := s_color_id;
+signal falling_piece_table : piece_table_data;
+signal block_in_piece : STD_LOGIC := '0';
 begin
-    block_position <= (point.x / config.block_size.w, point.y / config.block_size.h);
-    block_relative_pixel_position <= (point.x mod config.block_size.w, point.y mod config.block_size.h);
-    piece_relative_block_position <= (block_position.x - falling_piece_position.x, block_position.y - falling_piece_position.y);
     falling_trigger_ticks <= config.piece_falling_ticks(level);
 
     falling_block_clock_timer : clock_timer
@@ -70,68 +120,51 @@ begin
     );
 
     process(clock)
+    variable next_position : tetris_point;
+    variable local_table : tetris_table_data;
     begin
         if rising_edge(clock) then
             if falling_triggered = '1' then
-                falling_piece_position.y <= falling_piece_position.y + 1;
+                next_position := (falling_piece_position.x, falling_piece_position.y + 1);
+                if is_table_colliding(next_position, falling_piece_table, table) then
+                    write_piece_to_table(falling_piece_position, falling_piece_table, falling_piece_color_id, table);
+                    falling_piece_position <= default_falling_piece_position;
+                else
+                    falling_piece_position <= next_position;
+                end if;
+            end if;
+        end if;
+    end process;
+
+    block_position <= (point.x / config.block_size.w, point.y / config.block_size.h);
+    piece_relative_block_position <= (block_position.x - falling_piece_position.x, block_position.y - falling_piece_position.y);
+    falling_piece_table <= get_rotation_table_by_type_id(falling_piece_type_id, falling_piece_rotation_id);
+    process(clock)
+    begin
+        if rising_edge(clock) then
+            if piece_relative_block_position.x >= 0 and
+                    piece_relative_block_position.y >= 0 and
+                    piece_relative_block_position.x < piece_table_size.w and
+                    piece_relative_block_position.y < piece_table_size.h and
+                    falling_piece_table(piece_relative_block_position.y, piece_relative_block_position.x) = '1' then
+                block_in_piece <= '1';
+            else
+                block_in_piece <= '0';
             end if;
         end if;
     end process;
 
     process(clock)
-    variable falling_piece_color : rgb_color;
-    variable falling_piece_table : piece_table_data;
     variable block_color_id : piece_color_id;
     variable block_color : rgb_color;
-    variable show_board : boolean;
-    variable show_black : boolean;
     begin
         if rising_edge(clock) then
-            falling_piece_color := get_color_by_type_id(falling_piece_type_id);
-            falling_piece_table := get_rotation_table_by_type_id(falling_piece_type_id, falling_piece_rotation_id);
             block_color_id := table(block_position.y, block_position.x);
             block_color := get_color_by_id(block_color_id);
-            show_board := true;
-            show_black := true;
-
-            if piece_relative_block_position.x >= 0 and
-                    piece_relative_block_position.y >= 0 and
-                    piece_relative_block_position.x < piece_table_size.w and
-                    piece_relative_block_position.y < piece_table_size.h then
-                if falling_piece_table(
-                            piece_relative_block_position.y,
-                            piece_relative_block_position.x
-                        ) = '1' then
-                    color <= falling_piece_color;
-                    show_board := false;
-                    show_black := false;
-                end if;
-            end if;
-
-            if show_board then
-                if block_relative_pixel_position.x = 0 then
-                    color <= white_color;
-                    show_black := false;
-                end if;
-
-                if block_relative_pixel_position.x = config.block_size.w - 1 then
-                    color <= white_color;
-                    show_black := false;
-                end if;
-
-                if block_relative_pixel_position.y = 0 then
-                    color <= white_color;
-                    show_black := false;
-                end if;
-
-                if block_relative_pixel_position.y = config.block_size.h - 1 then
-                    color <= white_color;
-                    show_black := false;
-                end if;
-            end if;
-
-            if show_black then
-                color <= black_color;
+            if block_in_piece = '1' then
+                color <= falling_piece_color;
+            else
+                color <= block_color;
             end if;
         end if;
     end process;

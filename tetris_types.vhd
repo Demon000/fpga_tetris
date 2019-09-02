@@ -32,8 +32,8 @@ package tetris_types is
             108108108 -- level 10
         ),
         table_position => (200, 200),
-        table_size => (400, 800),
-        block_size => (40, 40)
+        table_size => (320, 640),
+        block_size => (32, 32)
     );
 
     type piece_color_id is (

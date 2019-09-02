@@ -62,7 +62,7 @@ package generic_types is
     constant red_color : rgb_color := ("1111", "0000", "0000");
 
     -- f0f0f0
-    constant white_color : rgb_color := ("1111", "1111", "1111");
+    constant grey_color : rgb_color := ("1000", "1000", "1000");
 
 end package generic_types;
 package body generic_types is
