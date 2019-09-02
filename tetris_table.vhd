@@ -45,22 +45,17 @@ function is_table_colliding(
     return boolean is
 begin
     for i in 0 to piece_table_size.h - 1 loop
-        -- Falling starts from -2, we can't check this
-        --if piece_position.y + i < 0 then
-        --    return true;
-        --end if;
-
-        if piece_position.y + i > config.table_size.h - 1 then
-            return true;
-        end if;
-
         for j in 0 to piece_table_size.w - 1 loop
             if piece_table(i, j) = '1' then
+                if piece_position.y + i > tetris_table_size.h - 1 then
+                    return true;
+                end if;
+
                 if piece_position.x + j < 0 then
                     return true;
                 end if;
 
-                if piece_position.x + j > config.table_size.w - 1 then
+                if piece_position.x + j > tetris_table_size.w - 1 then
                     return true;
                 end if;
 
@@ -121,7 +116,6 @@ begin
 
     process(clock)
     variable next_position : tetris_point;
-    variable local_table : tetris_table_data;
     begin
         if rising_edge(clock) then
             if falling_triggered = '1' then
