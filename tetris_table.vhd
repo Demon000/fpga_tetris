@@ -117,44 +117,35 @@ begin
     );
 
     process(clock)
+    variable requested_next_position : tetris_point;
     variable next_position : tetris_point;
     begin
         if rising_edge(clock) then
             if falling_triggered = '1' then
-                next_position := (falling_piece_position.x, falling_piece_position.y + 1);
-                if is_table_colliding(next_position, falling_piece_table, table) then
+                requested_next_position := (falling_piece_position.x, falling_piece_position.y + 1);
+                if is_table_colliding(requested_next_position, falling_piece_table, table) then
                     write_piece_to_table(falling_piece_position, falling_piece_table, falling_piece_color_id, table);
-                    falling_piece_position <= default_falling_piece_position;
+                    next_position := default_falling_piece_position;
                 else
-                    falling_piece_position <= next_position;
+                    next_position := requested_next_position;
                 end if;
             end if;
-        end if;
-    end process;
 
-    process(clock)
-    variable next_position : tetris_point;
-    begin
-        if rising_edge(clock) then
             if left_button_press = '1' then
-                next_position := (falling_piece_position.x - 1, falling_piece_position.y);
-                if not is_table_colliding(next_position, falling_piece_table, table) then
-                    falling_piece_position <= next_position;
+                requested_next_position := (falling_piece_position.x - 1, falling_piece_position.y);
+                if not is_table_colliding(requested_next_position, falling_piece_table, table) then
+                    next_position := requested_next_position;
                 end if;
             end if;
-        end if;
-    end process;
 
-    process(clock)
-    variable next_position : tetris_point;
-    begin
-        if rising_edge(clock) then
             if right_button_press = '1' then
-                next_position := (falling_piece_position.x + 1, falling_piece_position.y);
-                if not is_table_colliding(next_position, falling_piece_table, table) then
-                    falling_piece_position <= next_position;
+                requested_next_position := (falling_piece_position.x + 1, falling_piece_position.y);
+                if not is_table_colliding(requested_next_position, falling_piece_table, table) then
+                    next_position := requested_next_position;
                 end if;
             end if;
+
+            falling_piece_position <= next_position;
         end if;
     end process;
 
