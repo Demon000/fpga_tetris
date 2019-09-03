@@ -15,8 +15,8 @@ package generic_types is
     end record size_2d;
 
     constant point_2d_init : point_2d := (
-        x => -1,
-        y => -1
+        x => 0,
+        y => 0
     );
 
     constant size_2d_init : size_2d := (
