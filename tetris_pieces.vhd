@@ -37,11 +37,7 @@ package tetris_pieces is
         table_270 : piece_table_data;
     end record tetris_piece;
 
-    function get_next_rotation(
-            rotation_id : in piece_rotation_id)
-        return piece_rotation_id;
-
-    function get_prev_rotation(
+    function get_next_rotation_id(
             rotation_id : in piece_rotation_id)
         return piece_rotation_id;
 
@@ -250,7 +246,7 @@ package tetris_pieces is
 end package tetris_pieces;
 
 package body tetris_pieces is
-    function get_next_rotation(
+    function get_next_rotation_id(
             rotation_id : in piece_rotation_id)
         return piece_rotation_id is
     variable next_rotation_id : piece_rotation_id;
@@ -263,22 +259,7 @@ package body tetris_pieces is
         end case;
 
         return next_rotation_id;
-    end function get_next_rotation;
-
-    function get_prev_rotation(
-            rotation_id : in piece_rotation_id)
-        return piece_rotation_id is
-    variable prev_rotation_id : piece_rotation_id;
-    begin
-        case rotation_id is
-            when normal_rotation_id => prev_rotation_id := third_rotation_id;
-            when first_rotation_id => prev_rotation_id := normal_rotation_id;
-            when second_rotation_id => prev_rotation_id := first_rotation_id;
-            when third_rotation_id => prev_rotation_id := second_rotation_id;
-        end case;
-
-        return prev_rotation_id;
-    end function get_prev_rotation;
+    end function get_next_rotation_id;
 
     function get_piece_by_type_id(
             type_id : tetris_piece_type_id)

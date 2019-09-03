@@ -17,6 +17,7 @@ port(
     sysclk : in STD_LOGIC;
     left_button : in STD_LOGIC;
     right_button : in STD_LOGIC;
+    rotate_button : in STD_LOGIC;
     red : out single_color;
     green : out single_color;
     blue : out single_color;
@@ -94,7 +95,8 @@ port(
     point : in point_2d;
     color : out rgb_color;
     left_button_press : in STD_LOGIC;
-    right_button_press : in STD_LOGIC
+    right_button_press : in STD_LOGIC;
+    rotate_button_press : in STD_LOGIC
 );
 end component;
 
@@ -121,6 +123,8 @@ signal left_button_state : STD_LOGIC;
 signal left_button_press : STD_LOGIC;
 signal right_button_state : STD_LOGIC;
 signal right_button_press : STD_LOGIC;
+signal rotate_button_state : STD_LOGIC;
+signal rotate_button_press : STD_LOGIC;
 
 begin
     clk_div_inst : clk_wiz_0
@@ -145,13 +149,6 @@ begin
         button_state => left_button_state
     );
 
-    right_button_debouncer : button_debouncer
-    port map(
-        clock => pixel_clock,
-        button => right_button,
-        button_state => right_button_state
-    );
-
     left_button_pulser : button_pulser
     port map(
         clock => pixel_clock,
@@ -159,11 +156,32 @@ begin
         button_press => left_button_press
     );
 
+    right_button_debouncer : button_debouncer
+    port map(
+        clock => pixel_clock,
+        button => right_button,
+        button_state => right_button_state
+    );
+
     right_button_pulser : button_pulser
     port map(
         clock => pixel_clock,
         button_state => right_button_state,
         button_press => right_button_press
+    );
+
+    rotate_button_debouncer : button_debouncer
+    port map(
+        clock => pixel_clock,
+        button => rotate_button,
+        button_state => rotate_button_state
+    );
+
+    rotate_button_pulser : button_pulser
+    port map(
+        clock => pixel_clock,
+        button_state => rotate_button_state,
+        button_press => rotate_button_press
     );
 
     tetris_table_0 : tetris_table
@@ -175,7 +193,8 @@ begin
         point => tetris_table_view_point,
         color => tetris_table_view_color,
         left_button_press => left_button_press,
-        right_button_press => right_button_press
+        right_button_press => right_button_press,
+        rotate_button_press => rotate_button_press
     );
 
     view_controller_inst : view_controller
