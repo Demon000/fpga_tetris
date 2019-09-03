@@ -36,15 +36,15 @@ package tetris_types is
         block_size => (32, 32)
     );
 
-    type tetris_piece_color_id is (
-        empty_color_id,
-        i_color_id,
-        j_color_id,
-        l_color_id,
-        o_color_id,
-        s_color_id,
-        t_color_id,
-        z_color_id
+    type tetris_piece_id is (
+        tetris_empty_id,
+        tetris_i_id,
+        tetris_j_id,
+        tetris_l_id,
+        tetris_o_id,
+        tetris_s_id,
+        tetris_t_id,
+        tetris_z_id
     );
 
     subtype tetris_point_int is integer range -32 to 31;
@@ -60,12 +60,12 @@ package tetris_types is
     end record tetris_size;
 
     constant tetris_table_size : tetris_size := (10, 20);
-    constant default_falling_piece_position : tetris_point := (3, -2);
+    constant tetris_default_falling_piece_position : tetris_point := (3, -2);
 
     type tetris_table_data is array(
         0 to tetris_table_size.h - 1,
         0 to tetris_table_size.w - 1
-    ) of tetris_piece_color_id;
+    ) of tetris_piece_id;
 
-    constant tetris_table_init : tetris_table_data := (others => (others => empty_color_id));
+    constant tetris_table_init : tetris_table_data := (others => (others => tetris_empty_id));
 end package tetris_types;
