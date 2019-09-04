@@ -184,9 +184,8 @@ begin
     process(clock)
     variable next_position : tetris_point;
     variable next_rotation_id : tetris_piece_rotation_id;
-    variable falling_piece_table : tetris_piece_table_data;
     variable next_falling_piece_table : tetris_piece_table_data;
-
+    variable falling_piece_table : tetris_piece_table_data;
     begin
         if rising_edge(clock) then
             falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
@@ -268,16 +267,18 @@ begin
     variable falling_piece_table : tetris_piece_table_data;
     begin
         if rising_edge(clock) then
+            block_drawing_piece_id <= table(block_position.y, block_position.x);
+
             relative_block_position := (block_position.x - falling_piece_position.x, block_position.y - falling_piece_position.y);
-            falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
             if relative_block_position.x >= 0 and
                     relative_block_position.y >= 0 and
                     relative_block_position.x <= tetris_piece_table_size.w - 1 and
-                    relative_block_position.y <= tetris_piece_table_size.h - 1 and
-                    falling_piece_table(relative_block_position.y, relative_block_position.x) = '1' then
-                block_drawing_piece_id <= falling_piece_id;
-            else
-                block_drawing_piece_id <= table(block_position.y, block_position.x);
+                    relative_block_position.y <= tetris_piece_table_size.h - 1 then
+
+                falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
+                if falling_piece_table(relative_block_position.y, relative_block_position.x) = '1' then
+                    block_drawing_piece_id <= falling_piece_id;
+                end if;
             end if;
         end if;
     end process;
@@ -286,9 +287,8 @@ begin
     variable block_color : rgb_color;
     begin
         if rising_edge(clock) then
-            if block_drawing_piece_id = tetris_empty_id then
-                color <= grey_color;
-            else
+            color <= grey_color;
+            if block_drawing_piece_id /= tetris_empty_id then
                 block_color := get_color_by_id(block_drawing_piece_id);
                 color <= block_color;
             end if;
