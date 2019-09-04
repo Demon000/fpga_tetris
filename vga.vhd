@@ -107,10 +107,6 @@ signal pixel_clock : STD_LOGIC;
 signal global_view_point : point_2d;
 signal global_view_color : rgb_color;
 
--- Position and size of the tetris table view
-constant tetris_table_position : point_2d := (100, 100);
-constant tetris_table_size : size_2d := (400, 800);
-
 -- Position and color of the tetris table view drawing beam
 signal tetris_table_view_point : point_2d;
 signal tetris_table_view_color : rgb_color;

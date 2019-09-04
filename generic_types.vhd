@@ -14,16 +14,6 @@ package generic_types is
         h : size_nat;
     end record size_2d;
 
-    constant point_2d_init : point_2d := (
-        x => 0,
-        y => 0
-    );
-
-    constant size_2d_init : size_2d := (
-        w => 0,
-        h => 0
-    );
-
     subtype single_color is STD_LOGIC_VECTOR(3 downto 0);
     type rgb_color is record
         r : single_color;

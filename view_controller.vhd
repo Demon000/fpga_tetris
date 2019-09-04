@@ -22,10 +22,17 @@ end view_controller;
 
 architecture main of view_controller is
 begin
-    view0_point <= (global_view_point.x - view0_position.x, global_view_point.y - view0_position.y);
+    view0_point <=
+            (global_view_point.x - view0_position.x, global_view_point.y - view0_position.y)
+                    when global_view_point.x >= view0_position.x and
+                    global_view_point.y >= view0_position.y and
+                    global_view_point.x < view0_position.x + view0_size.w and
+                    global_view_point.y < view0_position.y + view0_size.h else
+            (-1, -1);
 
     global_view_color <=
-            view0_color when global_view_point.x >= view0_position.x and
+            view0_color
+                    when global_view_point.x >= view0_position.x and
                     global_view_point.y >= view0_position.y and
                     global_view_point.x < view0_position.x + view0_size.w and
                     global_view_point.y < view0_position.y + view0_size.h else

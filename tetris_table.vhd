@@ -41,6 +41,18 @@ port(
 );
 end component;
 
+--component ila_0
+--port(
+--	clk : in STD_LOGIC;
+--	probe0 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
+--	probe1 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
+--	probe2 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
+--	probe3 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
+--	probe4 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
+--	probe5 : in STD_LOGIC_VECTOR(10 DOWNTO 0)
+--);
+--end component;
+
 function is_table_colliding(
         piece_position : tetris_point;
         piece_table : tetris_piece_table_data;
@@ -98,7 +110,14 @@ signal falling_trigger_ticks : natural;
 signal falling_triggered : STD_LOGIC;
 
 -- Position and size of the block being drawn
-signal block_position : tetris_point;
+signal block_position : tetris_point := (0, 0);
+signal block_relative_point : point_2d := (0, 0);
+
+--signal probe_point_x : STD_LOGIC_VECTOR(10 downto 0);
+--signal probe_point_y : STD_LOGIC_VECTOR(10 downto 0);
+
+--signal probe_block_relative_point_x : STD_LOGIC_VECTOR(10 downto 0);
+--signal probe_block_relative_point_y : STD_LOGIC_VECTOR(10 downto 0);
 
 signal falling_piece_id : tetris_piece_id := tetris_s_id;
 signal falling_piece_position : tetris_point := tetris_default_falling_piece_position;
@@ -117,6 +136,23 @@ begin
         trigger_ticks => falling_trigger_ticks,
         pulse => falling_triggered
     );
+
+--    probe_point_x <= std_logic_vector(to_unsigned(point.x, 11));
+--    probe_point_y <= std_logic_vector(to_unsigned(point.y, 11));
+
+--    probe_block_relative_point_x <= std_logic_vector(to_unsigned(block_relative_point.x, 11));
+--    probe_block_relative_point_y <= std_logic_vector(to_unsigned(block_relative_point.y, 11));
+
+--    ila_0_inst : ila_0
+--    port map(
+--        clk => clock,
+--        probe0 => probe_point_x,
+--        probe1 => probe_point_y,
+--        probe2 => probe_block_relative_point_x,
+--        probe3 => probe_block_relative_point_y,
+--        probe4 => "00000000000",
+--        probe5 => "00000000000"
+--    );
 
     process(clock)
     begin
@@ -195,7 +231,38 @@ begin
         end if;
     end process;
 
-    block_position <= (point.x / config.block_size.w, point.y / config.block_size.h);
+    process(clock)
+    begin
+        if rising_edge(clock) then
+            if point /= (-1, -1) then
+                
+                if block_relative_point.x < config.block_size.w - 1 then
+                    block_relative_point.x <= block_relative_point.x + 1;
+                else
+                    block_relative_point.x <= 0;
+
+                    if block_position.x < tetris_table_size.w - 1 then
+                        block_position.x <= block_position.x + 1;
+                    else
+                        block_position.x <= 0;
+
+                        if block_relative_point.y < config.block_size.h - 1 then
+                            block_relative_point.y <= block_relative_point.y + 1;
+                        else
+                            block_relative_point.y <= 0;
+
+                            if block_position.y < tetris_table_size.h - 1 then
+                                block_position.y <= block_position.y + 1;
+                            else
+                                block_position.y <= 0;
+                            end if;
+                        end if;
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+
     process(clock)
     variable relative_block_position : tetris_point;
     variable falling_piece_table : tetris_piece_table_data;
