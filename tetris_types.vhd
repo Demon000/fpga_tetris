@@ -5,11 +5,26 @@ library generic_types;
 use generic_types.generic_types.all;
 
 package tetris_types is
-    constant tetris_first_level : natural := 1;
-    constant tetris_last_level : natural := 10;
-    subtype tetris_level is natural range tetris_first_level to tetris_last_level;
+    subtype tetris_level is natural range 1 to 10;
+    constant tetris_first_level : tetris_level := 1;
+    constant tetris_last_level : tetris_level := 10;
 
     type tetris_piece_falling_ticks_data is array(tetris_first_level to tetris_last_level) of natural;
+
+    type tetris_state is (
+        tetris_init_state,
+        tetris_generate_new_piece_state,
+        tetris_wait_fall_piece_state,
+        tetris_try_fall_piece_state,
+        tetris_try_move_piece_left_state,
+        tetris_try_move_piece_right_state,
+        tetris_try_rotate_piece_right_state,
+        tetris_do_fall_piece_state,
+        tetris_do_move_piece_left_state,
+        tetris_do_move_piece_right_state,
+        tetris_do_rotate_piece_right_state,
+        tetris_place_piece_state
+    );
 
     type tetris_config is record
         piece_falling_ticks : tetris_piece_falling_ticks_data;

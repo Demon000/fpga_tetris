@@ -41,17 +41,12 @@ port(
 );
 end component;
 
---component ila_0
---port(
---	clk : in STD_LOGIC;
---	probe0 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
---	probe1 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
---	probe2 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
---	probe3 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
---	probe4 : in STD_LOGIC_VECTOR(10 DOWNTO 0);
---	probe5 : in STD_LOGIC_VECTOR(10 DOWNTO 0)
---);
---end component;
+component lfsr_3 is
+port(
+    clock : in STD_LOGIC;
+    output : out STD_LOGIC_VECTOR(2 downto 0)
+);
+end component;
 
 function is_table_colliding(
         piece_position : tetris_point;
@@ -100,32 +95,42 @@ end procedure write_piece_to_table;
 
 signal table : tetris_table_data := tetris_table_init;
 signal level : tetris_level := tetris_first_level;
-signal need_new_falling_piece : STD_LOGIC;
-signal move_falling_piece_left : STD_LOGIC;
-signal move_falling_piece_right : STD_LOGIC;
-signal move_falling_piece_down : STD_LOGIC;
-signal rotate_falling_piece_right : STD_LOGIC;
 
-signal falling_trigger_ticks : natural;
-signal falling_triggered : STD_LOGIC;
+signal falling_piece_id : tetris_piece_id;
+signal falling_piece_position : tetris_point;
+signal falling_piece_rotation_id : tetris_piece_rotation_id;
+
+signal falling_piece_position_down_collides : boolean;
+signal falling_piece_move_down_triggered : STD_LOGIC;
+signal falling_piece_move_down_ticks : natural;
+
+signal falling_piece_position_left_collides : boolean;
+signal falling_piece_move_left_triggered : STD_LOGIC;
+
+signal falling_piece_position_right_collides : boolean;
+signal falling_piece_move_right_triggered : STD_LOGIC;
+
+signal falling_piece_rotation_right_collides : boolean;
+signal falling_piece_rotate_right_triggered : STD_LOGIC;
+
+--signal need_new_falling_piece : STD_LOGIC;
+signal new_falling_piece_id_vec : STD_LOGIC_VECTOR(2 downto 0);
+
+-- State machine states
+signal current_state : tetris_state;
+signal next_state : tetris_state := tetris_init_state;
 
 -- Position and size of the block being drawn
-signal block_position : tetris_point := (0, 0);
-signal block_relative_point : point_2d := (0, 0);
+signal drawing_block_position : tetris_point := (0, 0);
+signal drawing_block_relative_point : point_2d := (0, 0);
+signal drawing_block_piece_id : tetris_piece_id;
 
---signal probe_point_x : STD_LOGIC_VECTOR(10 downto 0);
---signal probe_point_y : STD_LOGIC_VECTOR(10 downto 0);
-
---signal probe_block_relative_point_x : STD_LOGIC_VECTOR(10 downto 0);
---signal probe_block_relative_point_y : STD_LOGIC_VECTOR(10 downto 0);
-
-signal falling_piece_id : tetris_piece_id := tetris_s_id;
-signal falling_piece_position : tetris_point := tetris_default_falling_piece_position;
-signal falling_piece_rotation_id : tetris_piece_rotation_id := tetris_normal_rotation_id;
-
-signal block_drawing_piece_id : tetris_piece_id;
 begin
-    falling_trigger_ticks <= config.piece_falling_ticks(level);
+    falling_piece_move_down_ticks <= config.piece_falling_ticks(level);
+
+    falling_piece_move_left_triggered <= left_button_press;
+    falling_piece_move_right_triggered <= right_button_press;
+    falling_piece_rotate_right_triggered <= rotate_button_press;
 
     falling_block_clock_timer : clock_timer
     generic map(
@@ -133,100 +138,175 @@ begin
     )
     port map(
         clock => clock,
-        trigger_ticks => falling_trigger_ticks,
-        pulse => falling_triggered
+        trigger_ticks => falling_piece_move_down_ticks,
+        pulse => falling_piece_move_down_triggered
     );
 
---    probe_point_x <= std_logic_vector(to_unsigned(point.x, 11));
---    probe_point_y <= std_logic_vector(to_unsigned(point.y, 11));
-
---    probe_block_relative_point_x <= std_logic_vector(to_unsigned(block_relative_point.x, 11));
---    probe_block_relative_point_y <= std_logic_vector(to_unsigned(block_relative_point.y, 11));
-
---    ila_0_inst : ila_0
---    port map(
---        clk => clock,
---        probe0 => probe_point_x,
---        probe1 => probe_point_y,
---        probe2 => probe_block_relative_point_x,
---        probe3 => probe_block_relative_point_y,
---        probe4 => "00000000000",
---        probe5 => "00000000000"
---    );
+    next_falling_piece_id_lfsr : lfsr_3
+    port map(
+        clock => clock,
+        output => new_falling_piece_id_vec
+    );
 
     process(clock)
     begin
         if rising_edge(clock) then
-            if need_new_falling_piece = '1' then
-                falling_piece_id <= tetris_s_id;
+            if current_state = tetris_generate_new_piece_state then
+                case new_falling_piece_id_vec is
+                    when "000" => falling_piece_id <= tetris_t_id;
+                    when "001" => falling_piece_id <= tetris_i_id;
+                    when "010" => falling_piece_id <= tetris_j_id;
+                    when "011" => falling_piece_id <= tetris_l_id;
+                    when "100" => falling_piece_id <= tetris_o_id;
+                    when "101" => falling_piece_id <= tetris_s_id;
+                    when "110" => falling_piece_id <= tetris_t_id;
+                    when "111" => falling_piece_id <= tetris_z_id;
+                end case;
                 falling_piece_position <= tetris_default_falling_piece_position;
                 falling_piece_rotation_id <= tetris_normal_rotation_id;
             end if;
 
-            if rotate_falling_piece_right = '1' then
-                falling_piece_rotation_id <= get_next_rotation_id(falling_piece_rotation_id);
-            end if;
-
-            if move_falling_piece_down = '1' then
+            if current_state = tetris_do_fall_piece_state then
                 falling_piece_position <= (falling_piece_position.x, falling_piece_position.y + 1);
             end if;
 
-            if move_falling_piece_left = '1' then
+            if current_state = tetris_do_rotate_piece_right_state then
+                falling_piece_rotation_id <= get_next_rotation_id(falling_piece_rotation_id);
+            end if;
+
+            if current_state = tetris_do_move_piece_left_state then
                 falling_piece_position <= (falling_piece_position.x - 1, falling_piece_position.y);
             end if;
 
-            if move_falling_piece_right = '1' then
+            if current_state = tetris_do_move_piece_right_state then
                 falling_piece_position <= (falling_piece_position.x + 1, falling_piece_position.y);
             end if;
         end if;
     end process;
 
     process(clock)
-    variable next_position : tetris_point;
-    variable next_rotation_id : tetris_piece_rotation_id;
-    variable next_falling_piece_table : tetris_piece_table_data;
     variable falling_piece_table : tetris_piece_table_data;
     begin
         if rising_edge(clock) then
+            if current_state = tetris_place_piece_state then
+                falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
+                write_piece_to_table(falling_piece_position, falling_piece_table, falling_piece_id, table);
+            end if;
+        end if;
+    end process;
+
+    process(clock)
+    variable falling_piece_position_down : tetris_point;
+    variable falling_piece_table : tetris_piece_table_data;
+    begin
+        if rising_edge(clock) then
+            falling_piece_position_down_collides <= false;
             falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
-
-            need_new_falling_piece <= '0';
-            move_falling_piece_down <= '0';
-            if falling_triggered = '1' then
-                next_position := (falling_piece_position.x, falling_piece_position.y + 1);
-                if is_table_colliding(next_position, falling_piece_table, table) then
-                    write_piece_to_table(falling_piece_position, falling_piece_table, falling_piece_id, table);
-
-                    need_new_falling_piece <= '1';
-                else
-                    move_falling_piece_down <= '1';
-                end if;
+            falling_piece_position_down := (falling_piece_position.x, falling_piece_position.y + 1);
+            if is_table_colliding(falling_piece_position_down, falling_piece_table, table) then
+                falling_piece_position_down_collides <= true;
             end if;
+        end if;
+    end process;
 
-            move_falling_piece_left <= '0';
-            if left_button_press = '1' then
-                next_position := (falling_piece_position.x - 1, falling_piece_position.y);
-                if not is_table_colliding(next_position, falling_piece_table, table) then
-                    move_falling_piece_left <= '1';
-                end if;
+    process(clock)
+    variable falling_piece_position_left : tetris_point;
+    variable falling_piece_table : tetris_piece_table_data;
+    begin
+        if rising_edge(clock) then
+            falling_piece_position_left_collides <= false;
+            falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
+            falling_piece_position_left := (falling_piece_position.x - 1, falling_piece_position.y);
+            if is_table_colliding(falling_piece_position_left, falling_piece_table, table) then
+                falling_piece_position_left_collides <= true;
             end if;
+        end if;
+    end process;    
 
-            move_falling_piece_right <= '0';
-            if right_button_press = '1' then
-                next_position := (falling_piece_position.x + 1, falling_piece_position.y);
-                if not is_table_colliding(next_position, falling_piece_table, table) then
-                    move_falling_piece_right <= '1';
-                end if;
+    process(clock)
+    variable falling_piece_table : tetris_piece_table_data;
+    variable falling_piece_position_right : tetris_point;
+    begin
+        if rising_edge(clock) then
+            falling_piece_position_right_collides <= false;
+            falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
+            falling_piece_position_right := (falling_piece_position.x + 1, falling_piece_position.y);
+            if is_table_colliding(falling_piece_position_right, falling_piece_table, table) then
+                falling_piece_position_right_collides <= true;
             end if;
+        end if;
+    end process;   
 
-            rotate_falling_piece_right <= '0';
-            if rotate_button_press = '1' then
-                next_rotation_id := get_next_rotation_id(falling_piece_rotation_id);
-                next_falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, next_rotation_id);
-                if not is_table_colliding(falling_piece_position, next_falling_piece_table, table) then
-                    rotate_falling_piece_right <= '1';
-                end if;
+    process(clock)
+    variable next_falling_piece_table : tetris_piece_table_data;
+    variable falling_piece_rotation_right_id : tetris_piece_rotation_id;
+    begin
+        if rising_edge(clock) then
+            falling_piece_rotation_right_collides <= false;
+            falling_piece_rotation_right_id := get_next_rotation_id(falling_piece_rotation_id);
+            next_falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_right_id);
+            if is_table_colliding(falling_piece_position, next_falling_piece_table, table) then
+                falling_piece_rotation_right_collides <= true;
             end if;
+        end if;
+    end process;   
+
+    process(clock)
+    begin
+        if rising_edge(clock) then
+            current_state <= next_state;
+            case current_state is
+                when tetris_init_state =>
+                    next_state <= tetris_generate_new_piece_state;
+                when tetris_generate_new_piece_state =>
+                    next_state <= tetris_wait_fall_piece_state;
+                when tetris_wait_fall_piece_state =>
+                    if falling_piece_move_down_triggered = '1' then
+                        next_state <= tetris_try_fall_piece_state;
+                    elsif falling_piece_move_left_triggered = '1' then
+                        next_state <= tetris_try_move_piece_left_state;
+                    elsif falling_piece_move_right_triggered = '1' then
+                        next_state <= tetris_try_move_piece_right_state;
+                    elsif falling_piece_rotate_right_triggered = '1' then
+                        next_state <= tetris_try_rotate_piece_right_state;
+                    else
+                        next_state <= tetris_wait_fall_piece_state;
+                    end if;
+                when tetris_try_fall_piece_state =>
+                    if falling_piece_position_down_collides then
+                        next_state <= tetris_place_piece_state;
+                    else
+                        next_state <= tetris_do_fall_piece_state;
+                    end if;
+                when tetris_try_move_piece_left_state =>
+                    if falling_piece_position_left_collides then
+                        next_state <= tetris_wait_fall_piece_state;
+                    else
+                        next_state <= tetris_do_move_piece_left_state;
+                    end if;
+                when tetris_try_move_piece_right_state =>
+                    if falling_piece_position_right_collides then
+                        next_state <= tetris_wait_fall_piece_state;
+                    else
+                        next_state <= tetris_do_move_piece_right_state;
+                    end if;
+                when tetris_try_rotate_piece_right_state =>
+                    if falling_piece_rotation_right_collides then
+                        next_state <= tetris_wait_fall_piece_state;
+                    else
+                        next_state <= tetris_do_rotate_piece_right_state;
+                    end if;
+                when tetris_do_fall_piece_state =>
+                    next_state <= tetris_wait_fall_piece_state;
+                when tetris_do_move_piece_left_state =>
+                    next_state <= tetris_wait_fall_piece_state;
+                when tetris_do_move_piece_right_state =>
+                    next_state <= tetris_wait_fall_piece_state;
+                when tetris_do_rotate_piece_right_state =>
+                    next_state <= tetris_wait_fall_piece_state;
+                when tetris_place_piece_state =>
+                    next_state <= tetris_generate_new_piece_state;
+            end case;
         end if;
     end process;
 
@@ -235,25 +315,25 @@ begin
         if rising_edge(clock) then
             if point /= (-1, -1) then
                 
-                if block_relative_point.x < config.block_size.w - 1 then
-                    block_relative_point.x <= block_relative_point.x + 1;
+                if drawing_block_relative_point.x < config.block_size.w - 1 then
+                    drawing_block_relative_point.x <= drawing_block_relative_point.x + 1;
                 else
-                    block_relative_point.x <= 0;
+                    drawing_block_relative_point.x <= 0;
 
-                    if block_position.x < tetris_table_size.w - 1 then
-                        block_position.x <= block_position.x + 1;
+                    if drawing_block_position.x < tetris_table_size.w - 1 then
+                        drawing_block_position.x <= drawing_block_position.x + 1;
                     else
-                        block_position.x <= 0;
+                        drawing_block_position.x <= 0;
 
-                        if block_relative_point.y < config.block_size.h - 1 then
-                            block_relative_point.y <= block_relative_point.y + 1;
+                        if drawing_block_relative_point.y < config.block_size.h - 1 then
+                            drawing_block_relative_point.y <= drawing_block_relative_point.y + 1;
                         else
-                            block_relative_point.y <= 0;
+                            drawing_block_relative_point.y <= 0;
 
-                            if block_position.y < tetris_table_size.h - 1 then
-                                block_position.y <= block_position.y + 1;
+                            if drawing_block_position.y < tetris_table_size.h - 1 then
+                                drawing_block_position.y <= drawing_block_position.y + 1;
                             else
-                                block_position.y <= 0;
+                                drawing_block_position.y <= 0;
                             end if;
                         end if;
                     end if;
@@ -267,17 +347,15 @@ begin
     variable falling_piece_table : tetris_piece_table_data;
     begin
         if rising_edge(clock) then
-            block_drawing_piece_id <= table(block_position.y, block_position.x);
-
-            relative_block_position := (block_position.x - falling_piece_position.x, block_position.y - falling_piece_position.y);
+            relative_block_position := (drawing_block_position.x - falling_piece_position.x, drawing_block_position.y - falling_piece_position.y);
+            drawing_block_piece_id <= table(drawing_block_position.y, drawing_block_position.x);
             if relative_block_position.x >= 0 and
                     relative_block_position.y >= 0 and
                     relative_block_position.x <= tetris_piece_table_size.w - 1 and
                     relative_block_position.y <= tetris_piece_table_size.h - 1 then
-
                 falling_piece_table := get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
                 if falling_piece_table(relative_block_position.y, relative_block_position.x) = '1' then
-                    block_drawing_piece_id <= falling_piece_id;
+                    drawing_block_piece_id <= falling_piece_id;
                 end if;
             end if;
         end if;
@@ -288,8 +366,8 @@ begin
     begin
         if rising_edge(clock) then
             color <= grey_color;
-            if block_drawing_piece_id /= tetris_empty_id then
-                block_color := get_color_by_id(block_drawing_piece_id);
+            if drawing_block_piece_id /= tetris_empty_id then
+                block_color := get_color_by_id(drawing_block_piece_id);
                 color <= block_color;
             end if;
         end if;

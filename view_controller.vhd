@@ -26,14 +26,16 @@ begin
     variable view0_point_local : point_2d;
     begin
         if rising_edge(clock) then
-            global_view_color <= red_color;
             view0_point <= (-1, -1);
+            global_view_color <= black_color;
 
-            view0_point_local := (global_view_point.x - view0_position.x, global_view_point.y - view0_position.y);
-            if view0_point_local.x >= 0 and view0_point_local.x < view0_size.w and
-                    view0_point_local.y >= 0 and view0_point_local.y < view0_size.h then
-                global_view_color <= view0_color;
-                view0_point <= view0_point_local;
+            if global_view_point /= (-1, -1) then
+                view0_point_local := (global_view_point.x - view0_position.x, global_view_point.y - view0_position.y);
+                if view0_point_local.x >= 0 and view0_point_local.x < view0_size.w and
+                        view0_point_local.y >= 0 and view0_point_local.y < view0_size.h then
+                    global_view_color <= view0_color;
+                    view0_point <= view0_point_local;
+                end if;
             end if;
         end if;
     end process;
