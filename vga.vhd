@@ -139,6 +139,9 @@ begin
     );
 
     left_button_debouncer : button_debouncer
+    generic map(
+        max_button_count => 324324
+    )
     port map(
         clock => pixel_clock,
         button => left_button,
@@ -153,6 +156,9 @@ begin
     );
 
     right_button_debouncer : button_debouncer
+    generic map(
+        max_button_count => 324324
+    )
     port map(
         clock => pixel_clock,
         button => right_button,
@@ -167,6 +173,9 @@ begin
     );
 
     rotate_button_debouncer : button_debouncer
+    generic map(
+        max_button_count => 324324
+    )
     port map(
         clock => pixel_clock,
         button => rotate_button,

@@ -30,30 +30,6 @@ package generic_types is
     -- 000000
     constant black_color : rgb_color := ("0000", "0000", "0000");
 
-    -- 00f0f0
-    constant cyan_color : rgb_color := ("0000", "1111", "1111");
-
-    -- 0000f0
-    constant blue_color : rgb_color := ("0000", "0000", "1111");
-
-    -- f0a000
-    constant orange_color : rgb_color := ("1111", "1010", "0000");
-
-    -- f0f000
-    constant yellow_color : rgb_color := ("1111", "1111", "0000");
-
-    -- 00f000
-    constant green_color : rgb_color := ("0000", "1111", "0000");
-
-    -- a000f0
-    constant magenta_color : rgb_color := ("1010", "0000", "1111");
-
-    -- f00000
-    constant red_color : rgb_color := ("1111", "0000", "0000");
-
-    -- f0f0f0
-    constant grey_color : rgb_color := ("1000", "1000", "1000");
-
 end package generic_types;
 package body generic_types is
     function is_point_in_rectangle(

@@ -15,15 +15,12 @@ package tetris_types is
         tetris_init_state,
         tetris_generate_new_piece_state,
         tetris_wait_fall_piece_state,
-        tetris_try_fall_piece_state,
-        tetris_try_move_piece_left_state,
-        tetris_try_move_piece_right_state,
-        tetris_try_rotate_piece_right_state,
         tetris_do_fall_piece_state,
         tetris_do_move_piece_left_state,
         tetris_do_move_piece_right_state,
         tetris_do_rotate_piece_right_state,
-        tetris_place_piece_state
+        tetris_do_place_piece_state,
+        tetris_do_remove_full_lines_state
     );
 
     type tetris_config is record
@@ -35,20 +32,102 @@ package tetris_types is
 
     constant tetris_config_1280_1024_60 : tetris_config := (
         piece_falling_ticks => (
-            108108108, -- level 1
-            108108108,
-            108108108,
-            108108108,
-            108108108,
-            108108108,
-            108108108,
-            108108108,
-            108108108,
-            108108108 -- level 10
+            54054054, -- level 1
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054 -- level 10
         ),
-        table_position => (0, 0),
+        table_position => (440, 112),
         table_size => (400, 800),
         block_size => (40, 40)
+    );
+
+    subtype tetris_block_pixel_color_id is natural range 0 to 2;
+    type tetris_block_texture_table_data is array(
+        0 to 9,
+        0 to 9
+    ) of tetris_block_pixel_color_id;
+
+    constant tetris_empty_block_texture_table : tetris_block_texture_table_data := (
+        (0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        (0, 1, 0, 1, 1, 1, 1, 1, 1, 2),
+        (0, 0, 1, 0, 1, 1, 1, 1, 1, 2),
+        (0, 1, 0, 1, 1, 1, 1, 1, 0, 2),
+        (0, 1, 1, 1, 1, 1, 1, 1, 0, 2),
+        (0, 1, 1, 1, 1, 1, 1, 1, 0, 2),
+        (0, 1, 1, 1, 1, 1, 1, 0, 0, 2),
+        (0, 1, 1, 1, 1, 1, 0, 1, 0, 2),
+        (0, 1, 1, 0, 0, 0, 0, 0, 0, 2),
+        (0, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+    );
+
+    constant tetris_piece_block_texture_table : tetris_block_texture_table_data := (
+        (2, 2, 2, 2, 2, 2, 2, 2, 2, 2),
+        (2, 1, 2, 1, 1, 1, 1, 1, 1, 0),
+        (2, 2, 1, 1, 1, 1, 1, 1, 1, 0),
+        (2, 1, 1, 1, 1, 1, 1, 1, 1, 0),
+        (2, 1, 1, 1, 1, 1, 1, 1, 1, 0),
+        (2, 1, 1, 1, 1, 1, 1, 1, 1, 0),
+        (2, 1, 1, 1, 1, 1, 1, 1, 1, 0),
+        (2, 1, 1, 1, 1, 1, 1, 1, 0, 0),
+        (2, 1, 1, 1, 1, 1, 1, 0, 1, 0),
+        (2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    );
+
+    type tetris_block_color_pallete is array(0 to 2) of rgb_color;
+
+    constant tetris_empty_color_pallete : tetris_block_color_pallete := (
+        ("0000", "0000", "0000"),
+        ("1000", "1000", "1000"),
+        ("1010", "1010", "1010")
+    );
+
+    constant tetris_i_color_pallete : tetris_block_color_pallete := (
+        ("0000", "1110", "1110"),
+        ("0000", "1111", "1111"),
+        ("1110", "1111", "1111")
+    );
+
+    constant tetris_j_color_pallete : tetris_block_color_pallete := (
+        ("0000", "0000", "1110"),
+        ("0000", "0000", "1111"),
+        ("1110", "1110", "1111")
+    );
+
+    constant tetris_l_color_pallete : tetris_block_color_pallete := (
+        ("0101", "0001", "0000"),
+        ("1111", "0101", "0000"),
+        ("1111", "1111", "1010")
+    );
+
+    constant tetris_o_color_pallete : tetris_block_color_pallete := (
+        ("0101", "0101", "0000"),
+        ("1111", "1111", "0000"),
+        ("1111", "1111", "1111")
+    );
+
+    constant tetris_s_color_pallete : tetris_block_color_pallete := (
+        ("0000", "0101", "0000"),
+        ("0000", "1111", "0000"),
+        ("1110", "1111", "1110")
+    );
+
+    constant tetris_t_color_pallete : tetris_block_color_pallete := (
+        ("1110", "0000", "1110"),
+        ("0101", "0000", "1111"),
+        ("0101", "1110", "1111")
+    );
+
+    constant tetris_z_color_pallete : tetris_block_color_pallete := (
+        ("1110", "0000", "0000"),
+        ("1111", "0000", "0000"),
+        ("1111", "1110", "1110")
     );
 
     type tetris_piece_id is (

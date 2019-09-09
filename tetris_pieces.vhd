@@ -35,9 +35,13 @@ package tetris_pieces is
             type_id : tetris_piece_id)
         return tetris_piece;
 
-    function get_color_by_id(
-            color_id : tetris_piece_id)
-        return rgb_color;
+    function get_block_color_pallete_by_id(
+            type_id : tetris_piece_id)
+        return tetris_block_color_pallete;
+
+    function get_block_texture_by_id(
+            type_id : tetris_piece_id)
+        return tetris_block_texture_table_data;
 
     function get_rotation_table_by_type_id(
             type_id : tetris_piece_id;
@@ -228,14 +232,14 @@ package tetris_pieces is
         ),
         table_180 => (
             "0000",
-            "0110",
             "1100",
+            "0110",
             "0000"
         ),
         table_270 => (
-            "1000",
-            "1100",
             "0100",
+            "1100",
+            "1000",
             "0000"
         )
     );
@@ -276,24 +280,43 @@ package body tetris_pieces is
         return piece;
     end function get_piece_by_type_id;
 
-    function get_color_by_id(
-            color_id : tetris_piece_id)
-        return rgb_color is
-    variable color : rgb_color;
+    function get_block_color_pallete_by_id(
+            type_id : tetris_piece_id)
+        return tetris_block_color_pallete is
+    variable color_pallete : tetris_block_color_pallete;
     begin
-        case color_id is
-            when tetris_empty_id => color := black_color;
-            when tetris_i_id => color := cyan_color;
-            when tetris_j_id => color := blue_color;
-            when tetris_l_id => color := orange_color;
-            when tetris_o_id => color := yellow_color;
-            when tetris_s_id => color := green_color;
-            when tetris_t_id => color := magenta_color;
-            when tetris_z_id => color := red_color;
+        case type_id is
+            when tetris_empty_id => color_pallete := tetris_empty_color_pallete;
+            when tetris_i_id => color_pallete := tetris_i_color_pallete;
+            when tetris_j_id => color_pallete := tetris_j_color_pallete;
+            when tetris_l_id => color_pallete := tetris_l_color_pallete;
+            when tetris_o_id => color_pallete := tetris_o_color_pallete;
+            when tetris_s_id => color_pallete := tetris_s_color_pallete;
+            when tetris_t_id => color_pallete := tetris_t_color_pallete;
+            when tetris_z_id => color_pallete := tetris_z_color_pallete;
         end case;
 
-        return color;
-    end function get_color_by_id;
+        return color_pallete;
+    end function get_block_color_pallete_by_id;
+
+    function get_block_texture_by_id(
+            type_id : tetris_piece_id)
+        return tetris_block_texture_table_data is
+    variable block_texture : tetris_block_texture_table_data;
+    begin
+        case type_id is
+            when tetris_empty_id => block_texture := tetris_empty_block_texture_table;
+            when tetris_i_id => block_texture := tetris_piece_block_texture_table;
+            when tetris_j_id => block_texture := tetris_piece_block_texture_table;
+            when tetris_l_id => block_texture := tetris_piece_block_texture_table;
+            when tetris_o_id => block_texture := tetris_piece_block_texture_table;
+            when tetris_s_id => block_texture := tetris_piece_block_texture_table;
+            when tetris_t_id => block_texture := tetris_piece_block_texture_table;
+            when tetris_z_id => block_texture := tetris_piece_block_texture_table;
+        end case;
+
+        return block_texture;
+    end function get_block_texture_by_id;
 
     function get_rotation_table_by_type_id(
             type_id : tetris_piece_id;

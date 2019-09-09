@@ -76,38 +76,19 @@ begin
         end if;
     end process;
 
-    process(clock)
-    begin
-        if rising_edge(clock) then
-            if stream.x >= hsync_start and stream.x < hsync_end then
-                hsync <= '1';
-            else
-                hsync <= '0';
-            end if;
-        end if;
-    end process;
+    hsync <=
+            '1' when
+                stream.x >= hsync_start and stream.x < hsync_end else
+            '0';
+                
+    vsync <=
+            '1' when
+                stream.y >= vsync_start and stream.y < vsync_end else
+            '0';
 
-    process(clock)
-    begin
-        if rising_edge(clock) then
-            if stream.y >= vsync_start and stream.y < vsync_end then
-                vsync <= '1';
-            else
-                vsync <= '0';
-            end if;
-        end if;
-    end process;
-
-    process(clock)
-    begin
-        if rising_edge(clock) then
-            if stream.x >= hview_start and stream.x < hview_end and
-                    stream.y >= vview_start and stream.y < vview_end then
-                point <= (stream.x - hview_start, stream.y - vview_start);
-            else
-                point <= (-1, -1);
-            end if;
-        end if;
-    end process;
-
+    point <=
+            (stream.x - hview_start, stream.y - vview_start) when
+                stream.x >= hview_start and stream.x < hview_end and
+                stream.y >= vview_start and stream.y < vview_end else
+            (-1, -1);
 end main;
