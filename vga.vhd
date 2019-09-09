@@ -113,7 +113,7 @@ signal tetris_table_view_color : rgb_color;
 
 constant used_vga_config : vga_config := vga_config_1280_1024_60;
 constant used_tetris_config : tetris_config := tetris_config_1280_1024_60;
-
+constant used_max_button_count : natural := 324324;
 -- Buttons
 signal left_button_state : STD_LOGIC;
 signal left_button_press : STD_LOGIC;
@@ -140,7 +140,7 @@ begin
 
     left_button_debouncer : button_debouncer
     generic map(
-        max_button_count => 324324
+        max_button_count => used_max_button_count
     )
     port map(
         clock => pixel_clock,
@@ -157,7 +157,7 @@ begin
 
     right_button_debouncer : button_debouncer
     generic map(
-        max_button_count => 324324
+        max_button_count => used_max_button_count
     )
     port map(
         clock => pixel_clock,
@@ -174,7 +174,7 @@ begin
 
     rotate_button_debouncer : button_debouncer
     generic map(
-        max_button_count => 324324
+        max_button_count => used_max_button_count
     )
     port map(
         clock => pixel_clock,

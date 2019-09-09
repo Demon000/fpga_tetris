@@ -192,7 +192,6 @@ begin
                 write_piece_to_table(falling_piece_position, falling_piece_table, falling_piece_id, table);
             end if;
 
-            falling_piece_formed_line <= false;
             if current_state = tetris_do_remove_full_lines_state then
                 formed_line := false;
                 for i in tetris_table_size.h - 1 downto 0 loop
