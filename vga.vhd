@@ -18,6 +18,7 @@ port(
     left_button : in STD_LOGIC;
     right_button : in STD_LOGIC;
     rotate_button : in STD_LOGIC;
+    down_button : in STD_LOGIC;
     red : out single_color;
     green : out single_color;
     blue : out single_color;
@@ -85,6 +86,20 @@ port(
 );
 end component;
 
+-- Clock Timer component
+component clock_timer is
+generic(
+    restart_on_end : boolean := false
+);
+port(
+    clock : in STD_LOGIC;
+    trigger_ticks : in natural;
+    paused : in STD_LOGIC := '0';
+    restart : in STD_LOGIC :=  '0';
+    pulse : out STD_LOGIC
+);
+end component;
+
 -- Tetris table component
 component tetris_table is
 generic(
@@ -96,6 +111,7 @@ port(
     color : out rgb_color;
     left_button_press : in STD_LOGIC;
     right_button_press : in STD_LOGIC;
+    down_button_press : in STD_LOGIC;
     rotate_button_press : in STD_LOGIC
 );
 end component;
@@ -114,11 +130,28 @@ signal tetris_table_view_color : rgb_color;
 constant used_vga_config : vga_config := vga_config_1280_1024_60;
 constant used_tetris_config : tetris_config := tetris_config_1280_1024_60;
 constant used_max_button_count : natural := 324324;
+
 -- Buttons
+constant button_repress_ticks : natural := 54054054;
+
 signal left_button_state : STD_LOGIC;
+signal left_button_state_inverted : STD_LOGIC;
+signal left_button_onepress : STD_LOGIC;
+signal left_button_repress : STD_LOGIC;
 signal left_button_press : STD_LOGIC;
+
 signal right_button_state : STD_LOGIC;
+signal right_button_state_inverted : STD_LOGIC;
+signal right_button_onepress : STD_LOGIC;
+signal right_button_repress : STD_LOGIC;
 signal right_button_press : STD_LOGIC;
+
+signal down_button_state : STD_LOGIC;
+signal down_button_state_inverted : STD_LOGIC;
+signal down_button_onepress : STD_LOGIC;
+signal down_button_repress : STD_LOGIC;
+signal down_button_press : STD_LOGIC;
+
 signal rotate_button_state : STD_LOGIC;
 signal rotate_button_press : STD_LOGIC;
 
@@ -152,8 +185,22 @@ begin
     port map(
         clock => pixel_clock,
         button_state => left_button_state,
-        button_press => left_button_press
+        button_press => left_button_onepress
     );
+
+    left_button_state_inverted <= not left_button_state;
+    left_button_repress_clock_timer : clock_timer
+    generic map(
+        restart_on_end => true
+    )
+    port map(
+        clock => pixel_clock,
+        trigger_ticks => button_repress_ticks,
+        paused => left_button_state_inverted,
+        restart => left_button_onepress,
+        pulse => left_button_repress
+    );
+    left_button_press <= left_button_onepress or left_button_repress;
 
     right_button_debouncer : button_debouncer
     generic map(
@@ -169,8 +216,53 @@ begin
     port map(
         clock => pixel_clock,
         button_state => right_button_state,
-        button_press => right_button_press
+        button_press => right_button_onepress
     );
+
+    right_button_state_inverted <= not right_button_state;
+    right_button_repress_clock_timer : clock_timer
+    generic map(
+        restart_on_end => true
+    )
+    port map(
+        clock => pixel_clock,
+        trigger_ticks => button_repress_ticks,
+        paused => right_button_state_inverted,
+        restart => right_button_onepress,
+        pulse => right_button_repress
+    );
+    right_button_press <= right_button_onepress or right_button_repress;
+
+    down_button_debouncer : button_debouncer
+    generic map(
+        max_button_count => used_max_button_count
+    )
+    port map(
+        clock => pixel_clock,
+        button => down_button,
+        button_state => down_button_state
+    );
+
+    down_button_pulser : button_pulser
+    port map(
+        clock => pixel_clock,
+        button_state => down_button_state,
+        button_press => down_button_onepress
+    );
+
+    down_button_state_inverted <= not down_button_state;
+    down_button_repress_clock_timer : clock_timer
+    generic map(
+        restart_on_end => true
+    )
+    port map(
+        clock => pixel_clock,
+        trigger_ticks => button_repress_ticks,
+        paused => down_button_state_inverted,
+        restart => down_button_onepress,
+        pulse => down_button_repress
+    );
+    down_button_press <= down_button_onepress or down_button_repress;
 
     rotate_button_debouncer : button_debouncer
     generic map(
@@ -199,6 +291,7 @@ begin
         color => tetris_table_view_color,
         left_button_press => left_button_press,
         right_button_press => right_button_press,
+        down_button_press => down_button_press,
         rotate_button_press => rotate_button_press
     );
 

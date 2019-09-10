@@ -14,10 +14,10 @@ package tetris_types is
     type tetris_state is (
         tetris_init_state,
         tetris_generate_new_piece_state,
-        tetris_wait_fall_piece_state,
-        tetris_do_fall_piece_state,
+        tetris_wait_action_piece_state,
         tetris_do_move_piece_left_state,
         tetris_do_move_piece_right_state,
+        tetris_do_move_piece_down_state,
         tetris_do_rotate_piece_right_state,
         tetris_do_place_piece_state,
         tetris_do_remove_full_lines_state
@@ -156,10 +156,8 @@ package tetris_types is
     constant tetris_table_size : tetris_size := (10, 20);
     constant tetris_default_falling_piece_position : tetris_point := (3, -2);
 
-    type tetris_table_data is array(
-        0 to tetris_table_size.h - 1,
-        0 to tetris_table_size.w - 1
-    ) of tetris_piece_id;
-
-    constant tetris_table_init : tetris_table_data := (others => (others => tetris_empty_id));
+    type tetris_table_row_data is array(0 to tetris_table_size.w - 1) of tetris_piece_id;
+    type tetris_table_data is array(0 to tetris_table_size.h - 1) of tetris_table_row_data;
+    constant tetris_table_row_empty : tetris_table_row_data := (others => tetris_empty_id);
+    constant tetris_table_init : tetris_table_data := (others => tetris_table_row_empty);
 end package tetris_types;
