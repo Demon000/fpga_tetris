@@ -8,6 +8,12 @@ package generic_types is
         y : point_int;
     end record point_2d;
 
+    subtype point_small_int is integer range -128 to 127;
+    type point_small_2d is record
+        x : point_small_int;
+        y : point_small_int;
+    end record point_small_2d;
+
     subtype size_nat is natural range 0 to 2047;
     type size_2d is record
         w : size_nat;

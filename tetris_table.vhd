@@ -290,7 +290,7 @@ begin
     variable block_pixel_color_id : tetris_block_pixel_color_id;
     variable block_pixel_color : rgb_color;
     variable drawing_block_position : tetris_point := (0, 0);
-    variable drawing_block_relative_point : point_2d := (0, 0);
+    variable drawing_block_relative_point : point_small_2d := (0, 0);
     variable drawing_block_piece_id : tetris_piece_id;
     begin
         if rising_edge(clock) then
