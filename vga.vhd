@@ -73,7 +73,8 @@ generic(
 port(
     clock: in STD_LOGIC;
     button : in STD_LOGIC := '0';
-    button_state : out STD_LOGIC := '0'
+    button_state : out STD_LOGIC := '0';
+    min_button_ticks : natural := 10000000
 );
 end component;
 
@@ -129,10 +130,10 @@ signal tetris_table_view_color : rgb_color;
 
 constant used_vga_config : vga_config := vga_config_1280_1024_60;
 constant used_tetris_config : tetris_config := tetris_config_1280_1024_60;
-constant used_max_button_count : natural := 324324;
 
 -- Buttons
-constant button_repress_ticks : natural := 54054054;
+constant min_button_press_ticks : natural := 324324;
+constant button_repress_ticks : natural := 27027027;
 
 signal left_button_state : STD_LOGIC;
 signal left_button_state_inverted : STD_LOGIC;
@@ -172,13 +173,11 @@ begin
     );
 
     left_button_debouncer : button_debouncer
-    generic map(
-        max_button_count => used_max_button_count
-    )
     port map(
         clock => pixel_clock,
         button => left_button,
-        button_state => left_button_state
+        button_state => left_button_state,
+        min_button_ticks => min_button_press_ticks
     );
 
     left_button_pulser : button_pulser
@@ -203,13 +202,11 @@ begin
     left_button_press <= left_button_onepress or left_button_repress;
 
     right_button_debouncer : button_debouncer
-    generic map(
-        max_button_count => used_max_button_count
-    )
     port map(
         clock => pixel_clock,
         button => right_button,
-        button_state => right_button_state
+        button_state => right_button_state,
+        min_button_ticks => min_button_press_ticks
     );
 
     right_button_pulser : button_pulser
@@ -234,13 +231,11 @@ begin
     right_button_press <= right_button_onepress or right_button_repress;
 
     down_button_debouncer : button_debouncer
-    generic map(
-        max_button_count => used_max_button_count
-    )
     port map(
         clock => pixel_clock,
         button => down_button,
-        button_state => down_button_state
+        button_state => down_button_state,
+        min_button_ticks => min_button_press_ticks
     );
 
     down_button_pulser : button_pulser
@@ -265,13 +260,11 @@ begin
     down_button_press <= down_button_onepress or down_button_repress;
 
     rotate_button_debouncer : button_debouncer
-    generic map(
-        max_button_count => used_max_button_count
-    )
     port map(
         clock => pixel_clock,
         button => rotate_button,
-        button_state => rotate_button_state
+        button_state => rotate_button_state,
+        min_button_ticks => min_button_press_ticks
     );
 
     rotate_button_pulser : button_pulser
