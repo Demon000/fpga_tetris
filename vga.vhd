@@ -67,9 +67,6 @@ end component;
 
 -- Button Debouncer component
 component button_debouncer is
-generic(
-    max_button_count : natural := 10000000
-);
 port(
     clock: in STD_LOGIC;
     button : in STD_LOGIC := '0';
