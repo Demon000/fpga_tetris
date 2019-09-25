@@ -121,19 +121,19 @@ signal falling_piece_rotate_right_triggered : STD_LOGIC;
 signal falling_piece_rotation_right_id : tetris_piece_rotation_id;
 signal falling_piece_rotation_right_table : tetris_piece_table_data;
 
-constant max_remove_full_lines_iterations : tetris_size_nat := 4;
-signal remove_full_lines_iterations : tetris_size_nat := 0;
+constant max_remove_full_lines_iterations : size_small_nat := 4;
+signal remove_full_lines_iterations : size_small_nat := 0;
 
 signal new_falling_piece_id_vec : STD_LOGIC_VECTOR(2 downto 0);
 
 -- State machine states
 signal current_state : tetris_state := tetris_init_state;
-signal next_state : tetris_state;
 
 begin
     falling_piece_table <= get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
 
     falling_piece_fall_down_ticks <= config.piece_falling_ticks(level);
+    falling_piece_move_down_triggered <= down_button_press;
     falling_piece_position_down <= (falling_piece_position.x, falling_piece_position.y + 1);
     falling_piece_position_down_collides <= is_table_colliding(falling_piece_position_down, falling_piece_table, table);
 
