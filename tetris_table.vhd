@@ -31,13 +31,12 @@ architecture main of tetris_table is
 
 component clock_timer is
 generic(
-    restart_on_end : boolean := false
+    trigger_on_start : boolean := false
 );
 port(
     clock : in STD_LOGIC;
     trigger_ticks : in natural;
-    paused : in STD_LOGIC := '0';
-    restart : in STD_LOGIC :=  '0';
+    stopped : in STD_LOGIC := '0';
     pulse : out STD_LOGIC
 );
 end component;
@@ -154,7 +153,7 @@ begin
 
     falling_block_clock_timer : clock_timer
     generic map(
-        restart_on_end => true
+        trigger_on_start => true
     )
     port map(
         clock => clock,

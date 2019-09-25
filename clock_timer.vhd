@@ -3,36 +3,41 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity clock_timer is
 generic(
-    restart_on_end : boolean := false
+    trigger_on_start : boolean := false
 );
 port(
     clock : in STD_LOGIC;
     trigger_ticks : in natural;
-    paused : in STD_LOGIC := '0';
-    restart : in STD_LOGIC :=  '0';
+    stopped : in STD_LOGIC := '0';
     pulse : out STD_LOGIC
 );
 end clock_timer;
 
 architecture main of clock_timer is
-signal counted_clocks : natural := 0;
 begin
     process(clock)
+    variable counted_ticks : natural := 0;
     begin
         if rising_edge(clock) then
-            if restart = '1' then
-                counted_clocks <= 0;
-            end if;
+            pulse <= '0';
 
-            if paused = '0' then
-                if counted_clocks >= trigger_ticks - 1 then
-                    pulse <= '1';
-                    if restart_on_end = true then
-                        counted_clocks <= 0;
+            if stopped = '1' then
+                counted_ticks := 0;
+            else
+                if trigger_on_start then
+                    if counted_ticks = 0 then
+                        pulse <= '1';
                     end if;
                 else
-                    pulse <= '0';
-                    counted_clocks <= counted_clocks + 1;
+                    if counted_ticks = trigger_ticks then
+                        pulse <= '1';
+                    end if;
+                end if;
+
+                if counted_ticks = trigger_ticks then
+                    counted_ticks := 0;
+                else
+                    counted_ticks := counted_ticks + 1;
                 end if;
             end if;
         end if;

@@ -75,25 +75,15 @@ port(
 );
 end component;
 
--- Button Pulser component
-component button_pulser is
-port(
-    clock: in STD_LOGIC;
-    button_state : in STD_LOGIC := '0';
-    button_press : out STD_LOGIC := '0'
-);
-end component;
-
 -- Clock Timer component
 component clock_timer is
 generic(
-    restart_on_end : boolean := false
+    trigger_on_start : boolean := false
 );
 port(
     clock : in STD_LOGIC;
     trigger_ticks : in natural;
-    paused : in STD_LOGIC := '0';
-    restart : in STD_LOGIC :=  '0';
+    stopped : in STD_LOGIC := '0';
     pulse : out STD_LOGIC
 );
 end component;
@@ -130,7 +120,8 @@ constant used_tetris_config : tetris_config := tetris_config_1280_1024_60;
 
 -- Buttons
 constant min_button_press_ticks : natural := 324324;
-constant button_repress_ticks : natural := 27027027;
+constant move_button_repress_ticks : natural := 27027027;
+constant rotate_button_repress_ticks : natural := 54054054;
 
 signal left_button_state : STD_LOGIC;
 signal left_button_state_inverted : STD_LOGIC;
@@ -140,17 +131,14 @@ signal left_button_press : STD_LOGIC;
 
 signal right_button_state : STD_LOGIC;
 signal right_button_state_inverted : STD_LOGIC;
-signal right_button_onepress : STD_LOGIC;
-signal right_button_repress : STD_LOGIC;
 signal right_button_press : STD_LOGIC;
 
 signal down_button_state : STD_LOGIC;
 signal down_button_state_inverted : STD_LOGIC;
-signal down_button_onepress : STD_LOGIC;
-signal down_button_repress : STD_LOGIC;
 signal down_button_press : STD_LOGIC;
 
 signal rotate_button_state : STD_LOGIC;
+signal rotate_button_state_inverted : STD_LOGIC;
 signal rotate_button_press : STD_LOGIC;
 
 begin
@@ -177,26 +165,17 @@ begin
         min_button_ticks => min_button_press_ticks
     );
 
-    left_button_pulser : button_pulser
-    port map(
-        clock => pixel_clock,
-        button_state => left_button_state,
-        button_press => left_button_onepress
-    );
-
     left_button_state_inverted <= not left_button_state;
     left_button_repress_clock_timer : clock_timer
     generic map(
-        restart_on_end => true
+        trigger_on_start => true
     )
     port map(
         clock => pixel_clock,
-        trigger_ticks => button_repress_ticks,
-        paused => left_button_state_inverted,
-        restart => left_button_onepress,
-        pulse => left_button_repress
+        trigger_ticks => move_button_repress_ticks,
+        stopped => left_button_state_inverted,
+        pulse => left_button_press
     );
-    left_button_press <= left_button_onepress or left_button_repress;
 
     right_button_debouncer : button_debouncer
     port map(
@@ -206,26 +185,17 @@ begin
         min_button_ticks => min_button_press_ticks
     );
 
-    right_button_pulser : button_pulser
-    port map(
-        clock => pixel_clock,
-        button_state => right_button_state,
-        button_press => right_button_onepress
-    );
-
     right_button_state_inverted <= not right_button_state;
     right_button_repress_clock_timer : clock_timer
     generic map(
-        restart_on_end => true
+        trigger_on_start => true
     )
     port map(
         clock => pixel_clock,
-        trigger_ticks => button_repress_ticks,
-        paused => right_button_state_inverted,
-        restart => right_button_onepress,
-        pulse => right_button_repress
+        trigger_ticks => move_button_repress_ticks,
+        stopped => right_button_state_inverted,
+        pulse => right_button_press
     );
-    right_button_press <= right_button_onepress or right_button_repress;
 
     down_button_debouncer : button_debouncer
     port map(
@@ -235,26 +205,17 @@ begin
         min_button_ticks => min_button_press_ticks
     );
 
-    down_button_pulser : button_pulser
-    port map(
-        clock => pixel_clock,
-        button_state => down_button_state,
-        button_press => down_button_onepress
-    );
-
     down_button_state_inverted <= not down_button_state;
     down_button_repress_clock_timer : clock_timer
     generic map(
-        restart_on_end => true
+        trigger_on_start => true
     )
     port map(
         clock => pixel_clock,
-        trigger_ticks => button_repress_ticks,
-        paused => down_button_state_inverted,
-        restart => down_button_onepress,
-        pulse => down_button_repress
+        trigger_ticks => move_button_repress_ticks,
+        stopped => down_button_state_inverted,
+        pulse => down_button_press
     );
-    down_button_press <= down_button_onepress or down_button_repress;
 
     rotate_button_debouncer : button_debouncer
     port map(
@@ -264,11 +225,16 @@ begin
         min_button_ticks => min_button_press_ticks
     );
 
-    rotate_button_pulser : button_pulser
+    rotate_button_state_inverted <= not rotate_button_state;
+    rotate_button_repress_clock_timer : clock_timer
+    generic map(
+        trigger_on_start => true
+    )
     port map(
         clock => pixel_clock,
-        button_state => rotate_button_state,
-        button_press => rotate_button_press
+        trigger_ticks => rotate_button_repress_ticks,
+        stopped => rotate_button_state_inverted,
+        pulse => rotate_button_press
     );
 
     tetris_table_0 : tetris_table
