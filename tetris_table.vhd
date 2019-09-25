@@ -294,7 +294,7 @@ begin
     variable drawing_block_piece_id : tetris_piece_id;
     begin
         if rising_edge(clock) then
-            if point /= (-1, -1) then
+            if point /= point_2d_invalid then
                 if drawing_block_relative_point.x < config.block_size.w - 1 then
                     drawing_block_relative_point.x := drawing_block_relative_point.x + 1;
                 else

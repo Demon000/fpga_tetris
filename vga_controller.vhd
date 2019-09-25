@@ -90,5 +90,5 @@ begin
             (stream.x - hview_start, stream.y - vview_start) when
                 stream.x >= hview_start and stream.x < hview_end and
                 stream.y >= vview_start and stream.y < vview_end else
-            (-1, -1);
+            point_2d_invalid;
 end main;

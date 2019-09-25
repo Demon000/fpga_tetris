@@ -3,10 +3,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 package generic_types is
     subtype point_int is integer range -2048 to 2047;
+    constant point_int_invalid : point_int := 2047;
     type point_2d is record
         x : point_int;
         y : point_int;
     end record point_2d;
+    constant point_2d_invalid : point_2d := (point_int_invalid, point_int_invalid);
 
     subtype point_small_int is integer range -128 to 127;
     type point_small_2d is record

@@ -30,7 +30,7 @@ begin
             view0_point_local when
                 view0_point_local.x >= 0 and view0_point_local.x < view0_size.w and
                 view0_point_local.y >= 0 and view0_point_local.y < view0_size.h else
-            (-1, -1);
+            point_2d_invalid;
 
     global_view_color <=
             view0_color when
