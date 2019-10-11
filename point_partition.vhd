@@ -18,8 +18,8 @@ port(
 end point_partition;
 
 architecture main of point_partition is
-signal local_partition : point_small_2d := (space_size.w - 1, space_size.h - 1);
-signal local_relative_point : point_small_2d := (partition_size.w - 1, partition_size.h - 1);
+signal local_partition : point_small_2d := (0, 0);
+signal local_relative_point : point_small_2d := (0, 0);
 begin
     process(clock)
     begin

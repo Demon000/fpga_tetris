@@ -55,7 +55,7 @@ constant vview_end : vga_integer := vview_start + config.vview_length;
 constant vdraw_end : vga_integer := vview_end;
 
 -- Position of the stream
-signal stream : point_2d := (hdraw_end - 1, vdraw_end - 1);
+signal stream : point_2d := (0, 0);
 
 begin
     process(clock)
