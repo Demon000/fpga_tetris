@@ -29,6 +29,19 @@ end tetris_table;
 
 architecture main of tetris_table is
 
+component point_partition is
+generic(
+    space_size : in size_small_2d;
+    partition_size : in size_small_2d
+);
+port(
+    clock: in STD_LOGIC;
+    paused : in STD_LOGIC;
+    partition : out point_small_2d;
+    relative_point : out point_small_2d
+);
+end component;
+
 component clock_timer is
 generic(
     trigger_on_start : boolean := false
@@ -49,7 +62,7 @@ port(
 end component;
 
 function is_table_colliding(
-        piece_position : tetris_point;
+        piece_position : point_small_2d;
         piece_table : tetris_piece_table_data;
         tetris_table : tetris_table_data)
     return boolean is
@@ -80,7 +93,7 @@ begin
 end function is_table_colliding;
 
 procedure write_piece_to_table(
-        piece_position : in tetris_point;
+        piece_position : in point_small_2d;
         piece_table : in tetris_piece_table_data;
         piece_id : in tetris_piece_id;
         signal tetris_table : out tetris_table_data) is
@@ -97,23 +110,28 @@ end procedure write_piece_to_table;
 signal table : tetris_table_data := tetris_table_init;
 signal level : tetris_level := tetris_first_level;
 
+signal is_not_drawing : STD_LOGIC;
+signal drawing_block_position : point_small_2d;
+signal drawing_block_relative_point : point_small_2d;
+signal block_pixel_color : rgb_color;
+
 signal falling_piece_id : tetris_piece_id;
-signal falling_piece_position : tetris_point;
+signal falling_piece_position : point_small_2d;
 signal falling_piece_rotation_id : tetris_piece_rotation_id;
 signal falling_piece_table : tetris_piece_table_data;
 
 signal falling_piece_position_down_collides : boolean;
-signal falling_piece_position_down : tetris_point;
+signal falling_piece_position_down : point_small_2d;
 signal falling_piece_fall_down_triggered : STD_LOGIC;
 signal falling_piece_fall_down_ticks : natural;
 signal falling_piece_move_down_triggered : STD_LOGIC;
 
 signal falling_piece_position_left_collides : boolean;
-signal falling_piece_position_left : tetris_point;
+signal falling_piece_position_left : point_small_2d;
 signal falling_piece_move_left_triggered : STD_LOGIC;
 
 signal falling_piece_position_right_collides : boolean;
-signal falling_piece_position_right : tetris_point;
+signal falling_piece_position_right : point_small_2d;
 signal falling_piece_move_right_triggered : STD_LOGIC;
 
 signal falling_piece_rotation_right_collides : boolean;
@@ -130,26 +148,20 @@ signal new_falling_piece_id_vec : STD_LOGIC_VECTOR(2 downto 0);
 signal current_state : tetris_state := tetris_init_state;
 
 begin
-    falling_piece_table <= get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
-
-    falling_piece_fall_down_ticks <= config.piece_falling_ticks(level);
-    falling_piece_move_down_triggered <= down_button_press;
-    falling_piece_position_down <= (falling_piece_position.x, falling_piece_position.y + 1);
-    falling_piece_position_down_collides <= is_table_colliding(falling_piece_position_down, falling_piece_table, table);
-
-    falling_piece_move_left_triggered <= left_button_press;
-    falling_piece_position_left <= (falling_piece_position.x - 1, falling_piece_position.y);
-    falling_piece_position_left_collides <= is_table_colliding(falling_piece_position_left, falling_piece_table, table);
-
-
-    falling_piece_move_right_triggered <= right_button_press;
-    falling_piece_position_right <= (falling_piece_position.x + 1, falling_piece_position.y);
-    falling_piece_position_right_collides <= is_table_colliding(falling_piece_position_right, falling_piece_table, table);
-
-    falling_piece_rotate_right_triggered <= rotate_button_press;
-    falling_piece_rotation_right_id <= get_next_rotation_id(falling_piece_rotation_id);
-    falling_piece_rotation_right_table <= get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_right_id);
-    falling_piece_rotation_right_collides <= is_table_colliding(falling_piece_position, falling_piece_rotation_right_table, table);
+    is_not_drawing <=
+            '0' when point /= point_2d_invalid else
+            '1';
+    block_point_partition : point_partition
+    generic map(
+        space_size => tetris_table_size,
+        partition_size => config.block_size
+    )
+    port map(
+        clock => clock,
+        paused => is_not_drawing,
+        partition => drawing_block_position,
+        relative_point => drawing_block_relative_point
+    );
 
     falling_block_clock_timer : clock_timer
     generic map(
@@ -229,52 +241,53 @@ begin
     end process;
 
     process(clock)
+    variable next_state : tetris_state;
     begin
         if rising_edge(clock) then
             case current_state is
                 when tetris_init_state =>
-                    next_state <= tetris_generate_new_piece_state;
+                    next_state := tetris_generate_new_piece_state;
                 when tetris_generate_new_piece_state =>
-                    next_state <= tetris_wait_action_piece_state;
+                    next_state := tetris_wait_action_piece_state;
                 when tetris_wait_action_piece_state =>
-                    next_state <= tetris_wait_action_piece_state;
+                    next_state := tetris_wait_action_piece_state;
                     if falling_piece_move_down_triggered = '1'
                             or falling_piece_fall_down_triggered = '1' then
                         if falling_piece_position_down_collides then
-                            next_state <= tetris_do_place_piece_state;
+                            next_state := tetris_do_place_piece_state;
                         else
-                            next_state <= tetris_do_move_piece_down_state;
+                            next_state := tetris_do_move_piece_down_state;
                         end if;
                     elsif falling_piece_move_left_triggered = '1' then
                         if not falling_piece_position_left_collides then
-                            next_state <= tetris_do_move_piece_left_state;
+                            next_state := tetris_do_move_piece_left_state;
                         end if;
                     elsif falling_piece_move_right_triggered = '1' then
                         if not falling_piece_position_right_collides then
-                            next_state <= tetris_do_move_piece_right_state;
+                            next_state := tetris_do_move_piece_right_state;
                         end if;
                     elsif falling_piece_rotate_right_triggered = '1' then
                         if not falling_piece_rotation_right_collides then
-                            next_state <= tetris_do_rotate_piece_right_state;
+                            next_state := tetris_do_rotate_piece_right_state;
                         end if;
                     end if;
                 when tetris_do_move_piece_left_state =>
-                    next_state <= tetris_wait_action_piece_state;
+                    next_state := tetris_wait_action_piece_state;
                 when tetris_do_move_piece_right_state =>
-                    next_state <= tetris_wait_action_piece_state;
+                    next_state := tetris_wait_action_piece_state;
                 when tetris_do_move_piece_down_state =>
-                    next_state <= tetris_wait_action_piece_state;
+                    next_state := tetris_wait_action_piece_state;
                 when tetris_do_rotate_piece_right_state =>
-                    next_state <= tetris_wait_action_piece_state;
+                    next_state := tetris_wait_action_piece_state;
                 when tetris_do_place_piece_state =>
-                    next_state <= tetris_do_remove_full_lines_state;
+                    next_state := tetris_do_remove_full_lines_state;
                 when tetris_do_remove_full_lines_state =>
                     if remove_full_lines_iterations /= max_remove_full_lines_iterations then
                         remove_full_lines_iterations <= remove_full_lines_iterations + 1;
-                        next_state <= tetris_do_remove_full_lines_state;
+                        next_state := tetris_do_remove_full_lines_state;
                     else
                         remove_full_lines_iterations <= 0;
-                        next_state <= tetris_generate_new_piece_state;
+                        next_state := tetris_generate_new_piece_state;
                     end if;
             end case;
 
@@ -283,58 +296,51 @@ begin
     end process;
 
     process(clock)
-    variable relative_block_position : tetris_point;
+    variable relative_block_position : point_small_2d;
     variable block_texture : tetris_block_texture_table_data;
     variable block_pallete : tetris_block_color_pallete;
     variable block_pixel_color_id : tetris_block_pixel_color_id;
-    variable block_pixel_color : rgb_color;
-    variable drawing_block_position : tetris_point := (0, 0);
-    variable drawing_block_relative_point : point_small_2d := (0, 0);
     variable drawing_block_piece_id : tetris_piece_id;
     begin
         if rising_edge(clock) then
-            if point /= point_2d_invalid then
-                if drawing_block_relative_point.x < config.block_size.w - 1 then
-                    drawing_block_relative_point.x := drawing_block_relative_point.x + 1;
-                else
-                    drawing_block_relative_point.x := 0;
+            falling_piece_table <= get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_id);
 
-                    if drawing_block_position.x < tetris_table_size.w - 1 then
-                        drawing_block_position.x := drawing_block_position.x + 1;
-                    else
-                        drawing_block_position.x := 0;
+            falling_piece_fall_down_ticks <= config.piece_falling_ticks(level);
+            falling_piece_move_down_triggered <= down_button_press;
+            falling_piece_position_down <= (falling_piece_position.x, falling_piece_position.y + 1);
+            falling_piece_position_down_collides <= is_table_colliding(falling_piece_position_down, falling_piece_table, table);
 
-                        if drawing_block_relative_point.y < config.block_size.h - 1 then
-                            drawing_block_relative_point.y := drawing_block_relative_point.y + 1;
-                        else
-                            drawing_block_relative_point.y := 0;
+            falling_piece_move_left_triggered <= left_button_press;
+            falling_piece_position_left <= (falling_piece_position.x - 1, falling_piece_position.y);
+            falling_piece_position_left_collides <= is_table_colliding(falling_piece_position_left, falling_piece_table, table);
 
-                            if drawing_block_position.y < tetris_table_size.h - 1 then
-                                drawing_block_position.y := drawing_block_position.y + 1;
-                            else
-                                drawing_block_position.y := 0;
-                            end if;
-                        end if;
-                    end if;
-                end if;
+            falling_piece_move_right_triggered <= right_button_press;
+            falling_piece_position_right <= (falling_piece_position.x + 1, falling_piece_position.y);
+            falling_piece_position_right_collides <= is_table_colliding(falling_piece_position_right, falling_piece_table, table);
 
-                relative_block_position := (drawing_block_position.x - falling_piece_position.x, drawing_block_position.y - falling_piece_position.y);
+            falling_piece_rotate_right_triggered <= rotate_button_press;
+            falling_piece_rotation_right_id <= get_next_rotation_id(falling_piece_rotation_id);
+            falling_piece_rotation_right_table <= get_rotation_table_by_type_id(falling_piece_id, falling_piece_rotation_right_id);
+            falling_piece_rotation_right_collides <= is_table_colliding(falling_piece_position, falling_piece_rotation_right_table, table);
+
+            relative_block_position := (drawing_block_position.x - falling_piece_position.x, drawing_block_position.y - falling_piece_position.y);
+
+            if relative_block_position.x >= 0 and
+                    relative_block_position.y >= 0 and
+                    relative_block_position.x <= tetris_piece_table_size.w - 1 and
+                    relative_block_position.y <= tetris_piece_table_size.h - 1 and
+                    falling_piece_table(relative_block_position.y, relative_block_position.x) = '1' then
+                drawing_block_piece_id := falling_piece_id;
+            else
                 drawing_block_piece_id := table(drawing_block_position.y)(drawing_block_position.x);
-                if relative_block_position.x >= 0 and
-                        relative_block_position.y >= 0 and
-                        relative_block_position.x <= tetris_piece_table_size.w - 1 and
-                        relative_block_position.y <= tetris_piece_table_size.h - 1 then
-                    if falling_piece_table(relative_block_position.y, relative_block_position.x) = '1' then
-                        drawing_block_piece_id := falling_piece_id;
-                    end if;
-                end if;
-    
-                block_texture := get_block_texture_by_id(drawing_block_piece_id);
-                block_pallete := get_block_color_pallete_by_id(drawing_block_piece_id);
-                block_pixel_color_id := block_texture(drawing_block_relative_point.y / 4, drawing_block_relative_point.x / 4);
-                block_pixel_color := block_pallete(block_pixel_color_id);
-                color <= block_pixel_color;
             end if;
+
+            block_texture := get_block_texture_by_id(drawing_block_piece_id);
+            block_pallete := get_block_color_pallete_by_id(drawing_block_piece_id);
+            block_pixel_color_id := block_texture(drawing_block_relative_point.y / 4, drawing_block_relative_point.x / 4);
+            block_pixel_color <= block_pallete(block_pixel_color_id);
         end if;
     end process;
+
+    color <= block_pixel_color;
 end main;

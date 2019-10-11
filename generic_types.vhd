@@ -10,7 +10,7 @@ package generic_types is
     end record point_2d;
     constant point_2d_invalid : point_2d := (point_int_invalid, point_int_invalid);
 
-    subtype point_small_int is integer range -128 to 127;
+    subtype point_small_int is integer range -64 to 63;
     type point_small_2d is record
         x : point_small_int;
         y : point_small_int;
@@ -21,6 +21,12 @@ package generic_types is
         w : size_nat;
         h : size_nat;
     end record size_2d;
+
+    subtype size_small_nat is natural range 0 to 63;
+    type size_small_2d is record
+        w : size_small_nat;
+        h : size_small_nat;
+    end record size_small_2d;
 
     subtype single_color is STD_LOGIC_VECTOR(3 downto 0);
     type rgb_color is record

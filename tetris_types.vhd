@@ -27,7 +27,7 @@ package tetris_types is
         piece_falling_ticks : tetris_piece_falling_ticks_data;
         table_position : point_2d;
         table_size : size_2d;
-        block_size : size_2d;
+        block_size : size_small_2d;
     end record;
 
     constant tetris_config_1280_1024_60 : tetris_config := (
@@ -48,36 +48,51 @@ package tetris_types is
         block_size => (40, 40)
     );
 
+    constant tetris_config_1280_720_60 : tetris_config := (
+        piece_falling_ticks => (
+            54054054, -- level 1
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054,
+            54054054 -- level 10
+        ),
+        table_position => (480, 40),
+        table_size => (320, 640),
+        block_size => (32, 32)
+    );
+
     subtype tetris_block_pixel_color_id is natural range 0 to 2;
+    constant tetris_block_texture_table_width : natural := 8;
     type tetris_block_texture_table_data is array(
-        0 to 9,
-        0 to 9
+        0 to tetris_block_texture_table_width - 1,
+        0 to tetris_block_texture_table_width - 1
     ) of tetris_block_pixel_color_id;
 
     constant tetris_empty_block_texture_table : tetris_block_texture_table_data := (
-        (0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-        (0, 1, 0, 1, 1, 1, 1, 1, 1, 2),
-        (0, 0, 1, 0, 1, 1, 1, 1, 1, 2),
-        (0, 1, 0, 1, 1, 1, 1, 1, 0, 2),
-        (0, 1, 1, 1, 1, 1, 1, 1, 0, 2),
-        (0, 1, 1, 1, 1, 1, 1, 1, 0, 2),
-        (0, 1, 1, 1, 1, 1, 1, 0, 0, 2),
-        (0, 1, 1, 1, 1, 1, 0, 1, 0, 2),
-        (0, 1, 1, 0, 0, 0, 0, 0, 0, 2),
-        (0, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+        (0, 0, 0, 0, 0, 0, 0, 0),
+        (0, 1, 0, 1, 1, 1, 1, 2),
+        (0, 0, 1, 0, 1, 1, 1, 2),
+        (0, 1, 0, 1, 1, 1, 0, 2),
+        (0, 1, 1, 1, 1, 0, 0, 2),
+        (0, 1, 1, 1, 0, 1, 0, 2),
+        (0, 1, 1, 0, 0, 0, 0, 2),
+        (0, 2, 2, 2, 2, 2, 2, 2)
     );
 
     constant tetris_piece_block_texture_table : tetris_block_texture_table_data := (
-        (2, 2, 2, 2, 2, 2, 2, 2, 2, 2),
-        (2, 1, 2, 1, 1, 1, 1, 1, 1, 0),
-        (2, 2, 1, 1, 1, 1, 1, 1, 1, 0),
-        (2, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-        (2, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-        (2, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-        (2, 1, 1, 1, 1, 1, 1, 1, 1, 0),
-        (2, 1, 1, 1, 1, 1, 1, 1, 0, 0),
-        (2, 1, 1, 1, 1, 1, 1, 0, 1, 0),
-        (2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        (2, 2, 2, 2, 2, 2, 2, 2),
+        (2, 1, 2, 1, 1, 1, 1, 0),
+        (2, 2, 1, 1, 1, 1, 1, 0),
+        (2, 1, 1, 1, 1, 1, 1, 0),
+        (2, 1, 1, 1, 1, 1, 1, 0),
+        (2, 1, 1, 1, 1, 1, 0, 0),
+        (2, 1, 1, 1, 1, 0, 1, 0),
+        (2, 0, 0, 0, 0, 0, 0, 0)
     );
 
     type tetris_block_color_pallete is array(0 to 2) of rgb_color;
@@ -141,20 +156,8 @@ package tetris_types is
         tetris_z_id
     );
 
-    subtype tetris_point_int is integer range -32 to 31;
-    type tetris_point is record
-        x : tetris_point_int;
-        y : tetris_point_int;
-    end record tetris_point;
-
-    subtype tetris_size_nat is integer range 0 to 32;
-    type tetris_size is record
-        w : tetris_size_nat;
-        h : tetris_size_nat;
-    end record tetris_size;
-
-    constant tetris_table_size : tetris_size := (10, 20);
-    constant tetris_default_falling_piece_position : tetris_point := (3, -2);
+    constant tetris_table_size : size_small_2d := (10, 20);
+    constant tetris_default_falling_piece_position : point_small_2d := (3, -2);
 
     type tetris_table_row_data is array(0 to tetris_table_size.w - 1) of tetris_piece_id;
     type tetris_table_data is array(0 to tetris_table_size.h - 1) of tetris_table_row_data;

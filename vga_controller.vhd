@@ -55,8 +55,7 @@ constant vview_end : vga_integer := vview_start + config.vview_length;
 constant vdraw_end : vga_integer := vview_end;
 
 -- Position of the stream
--- First x increment will make it 0
-signal stream : point_2d := (-1, 0);
+signal stream : point_2d := (hdraw_end - 1, vdraw_end - 1);
 
 begin
     process(clock)

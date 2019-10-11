@@ -115,8 +115,8 @@ signal global_view_color : rgb_color;
 signal tetris_table_view_point : point_2d;
 signal tetris_table_view_color : rgb_color;
 
-constant used_vga_config : vga_config := vga_config_1280_1024_60;
-constant used_tetris_config : tetris_config := tetris_config_1280_1024_60;
+constant used_vga_config : vga_config := vga_config_1280_720_60;
+constant used_tetris_config : tetris_config := tetris_config_1280_720_60;
 
 -- Buttons
 constant min_button_press_ticks : natural := 324324;
