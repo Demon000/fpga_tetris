@@ -297,7 +297,6 @@ begin
 
     process(clock)
     variable relative_block_position : point_small_2d;
-    variable block_texture : tetris_block_texture_table_data;
     variable block_pallete : tetris_block_color_pallete;
     variable block_pixel_color_id : tetris_block_pixel_color_id;
     variable drawing_block_piece_id : tetris_piece_id;
@@ -335,9 +334,8 @@ begin
                 drawing_block_piece_id := table(drawing_block_position.y)(drawing_block_position.x);
             end if;
 
-            block_texture := get_block_texture_by_id(drawing_block_piece_id);
             block_pallete := get_block_color_pallete_by_id(drawing_block_piece_id);
-            block_pixel_color_id := block_texture(drawing_block_relative_point.y / 4, drawing_block_relative_point.x / 4);
+            block_pixel_color_id := tetris_block_texture_table(drawing_block_relative_point.y, drawing_block_relative_point.x);
             block_pixel_color <= block_pallete(block_pixel_color_id);
         end if;
     end process;

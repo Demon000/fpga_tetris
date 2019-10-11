@@ -39,10 +39,6 @@ package tetris_pieces is
             type_id : tetris_piece_id)
         return tetris_block_color_pallete;
 
-    function get_block_texture_by_id(
-            type_id : tetris_piece_id)
-        return tetris_block_texture_table_data;
-
     function get_rotation_table_by_type_id(
             type_id : tetris_piece_id;
             rotation_id : tetris_piece_rotation_id)
@@ -298,25 +294,6 @@ package body tetris_pieces is
 
         return color_pallete;
     end function get_block_color_pallete_by_id;
-
-    function get_block_texture_by_id(
-            type_id : tetris_piece_id)
-        return tetris_block_texture_table_data is
-    variable block_texture : tetris_block_texture_table_data;
-    begin
-        case type_id is
-            when tetris_empty_id => block_texture := tetris_empty_block_texture_table;
-            when tetris_i_id => block_texture := tetris_piece_block_texture_table;
-            when tetris_j_id => block_texture := tetris_piece_block_texture_table;
-            when tetris_l_id => block_texture := tetris_piece_block_texture_table;
-            when tetris_o_id => block_texture := tetris_piece_block_texture_table;
-            when tetris_s_id => block_texture := tetris_piece_block_texture_table;
-            when tetris_t_id => block_texture := tetris_piece_block_texture_table;
-            when tetris_z_id => block_texture := tetris_piece_block_texture_table;
-        end case;
-
-        return block_texture;
-    end function get_block_texture_by_id;
 
     function get_rotation_table_by_type_id(
             type_id : tetris_piece_id;
